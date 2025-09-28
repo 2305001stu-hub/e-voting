@@ -1,24 +1,274 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7BVeeelL1mKOuOaVSNeFrUKkKQPnLJH7a_w&s') no-repeat center center fixed;
-  background-size: cover;
-  color: #fff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Voting System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1524069290683-0457abfe42c3?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2Nob29lJTIwc3R1ZGVudHN8ZW58MHx8MHx8fDA%3D') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .navbar {
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 900px;
+      border-radius: 15px 15px 0 0;
+    }
+    
+    .navbar h1 {
+      margin: 0;
+      font-size: 36px;
+      color: #ffcc00;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    .navbar p {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #ddd;
+    }
+    
+    .container {
+      background: rgba(0,0,0,0.7);
+      padding: 40px;
+      border-radius: 0 0 15px 15px;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+    
+    .welcome-section {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    .welcome-section h2 {
+      color: #ffcc00;
+      margin-bottom: 15px;
+      font-size: 28px;
+    }
+    
+    .welcome-section p {
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .menu-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border-left: 4px solid #ffcc00;
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .menu-card h3 {
+      color: #ffcc00;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    
+    .menu-card p {
+      margin-bottom: 20px;
+      color: #ddd;
+    }
+    
+    .menu a {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #ffcc00;
+      color: #333;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .menu a:hover {
+      background: #ffd633;
+      box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 40px;
+      gap: 20px;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      min-width: 150px;
+      flex: 1;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #ffcc00;
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 16px;
+      color: #ddd;
+    }
+    
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%;
+    }
+    
+    @media (max-width: 768px) {
+      .navbar h1 {
+        font-size: 28px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      .menu {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>Student Voting System</h1>
+    <p>Cast your vote for student representatives</p>
+  </div>
+  
+  <div class="container">
+    <div class="welcome-section">
+      <h2>Welcome to the Student Election Portal</h2>
+      <p>This platform allows students to vote for their preferred candidates in a secure and transparent manner. 
+        Please select your role to continue.</p>
+    </div>
+    
+    <div class="menu">
+      <div class="menu-card">
+        <h3>Student Voting</h3>
+        <p>Cast your vote for student representatives</p>
+        <a href="vote.html">Enter Voting Booth</a>
+      </div>
+      
+      <div class="menu-card">
+        <h3>Teacher Panel</h3>
+        <p>Manage candidates and view election results</p>
+        <a href="teachers.html">Access Teacher Panel</a>
+      </div>
+      
+      <div class="menu-card">
+        <h3>Live Results</h3>
+        <p>View current election results in real-time</p>
+        <a href="results.html">View Results</a>
+      </div>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="candidateCount">5</span>
+        <span class="stat-label">Candidates</span>
+      </div>
+      
+      <div class="stat-card">
+        <span class="stat-number" id="voteCount">127</span>
+        <span class="stat-label">Votes Cast</span>
+      </div>
+      
+      <div class="stat-card">
+        <span class="stat-number" id="timeRemaining">2:15</span>
+        <span class="stat-label">Hours Remaining</span>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>Student Voting System &copy; 2023 | Secure • Transparent • Democratic</p>
+    </div>
+  </div>
 
-.menu {
-  margin-top: 50px;
-}
-
-.menu a {
-  display: block;
-  padding: 15px;
-  margin: 10px;
-  background: #333;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-}
-.menu a:hover {
-  background: #555;
-}
+  <script>
+    // Update stats with dynamic data (in a real app, this would come from a server)
+    document.addEventListener('DOMContentLoaded', function() {
+      // Simulate updating vote count
+      setInterval(() => {
+        const voteCountElement = document.getElementById('voteCount');
+        let currentVotes = parseInt(voteCountElement.textContent);
+        voteCountElement.textContent = currentVotes + Math.floor(Math.random() * 3);
+      }, 5000);
+      
+      // Update time remaining
+      function updateTimeRemaining() {
+        const now = new Date();
+        const endTime = new Date();
+        endTime.setHours(23, 59, 0, 0); // Set to end of day
+        
+        const diff = endTime - now;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        document.getElementById('timeRemaining').textContent = 
+          `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+      }
+      
+      updateTimeRemaining();
+      setInterval(updateTimeRemaining, 60000); // Update every minute
+    });
+  </script>
+</body>
+</html>
