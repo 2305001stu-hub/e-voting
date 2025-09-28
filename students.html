@@ -60,6 +60,12 @@
       font-size: 22px;
     }
     
+    h4 {
+      color: #ffcc00;
+      margin: 15px 0 10px 0;
+      font-size: 18px;
+    }
+    
     .section {
       margin-bottom: 30px;
       padding: 20px;
@@ -78,8 +84,7 @@
       color: #ffcc00;
     }
     
-    input[type="text"],
-    input[type="number"] {
+    input[type="text"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -132,6 +137,13 @@
       margin-top: 20px;
     }
     
+    .position-section {
+      margin-bottom: 25px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
     .candidate-item {
       display: flex;
       justify-content: space-between;
@@ -166,6 +178,10 @@
     .vote-btn:disabled {
       background: #9e9e9e;
       cursor: not-allowed;
+    }
+    
+    .vote-btn.selected {
+      background: #2196F3;
     }
     
     .message {
@@ -245,6 +261,14 @@
       display: none;
     }
     
+    .student-info {
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -265,6 +289,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+      }
+      
+      .position-section {
+        padding: 10px;
       }
     }
   </style>
@@ -358,7 +386,7 @@
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const studentId = document.getElementById('studentId').value.trim().toUpperCase();
+      const studentId = document.getElementById('studentId').value.trim();
       
       if (!studentId) {
         showLoginMessage('Please enter your student ID.', 'error');
@@ -474,13 +502,13 @@
       // Reset all buttons for this position to default state
       document.querySelectorAll(`.vote-btn[data-position="${selectedPosition}"]`).forEach(button => {
         button.textContent = 'Vote';
-        button.disabled = false;
+        button.classList.remove('selected');
       });
       
       // Mark the selected candidate
       const selectedButton = document.querySelector(`.vote-btn[data-candidate-id="${selectedCandidateId}"]`);
       selectedButton.textContent = 'Selected ✓';
-      selectedButton.disabled = true;
+      selectedButton.classList.add('selected');
     }
     
     // Function to record the vote
@@ -546,14 +574,16 @@
         
         positionCandidates.forEach(candidate => {
           const voteCount = voteCounts[candidate.id] || 0;
+          const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
+          const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
           
           const candidateResult = document.createElement('div');
           candidateResult.className = 'candidate-result';
           candidateResult.innerHTML = `
             <div class="candidate-name">${candidate.name}</div>
             <div class="vote-bar-container">
-              <div class="vote-bar" style="width: ${voteCount * 10}%"></div>
-              <div class="vote-count">${voteCount} votes</div>
+              <div class="vote-bar" style="width: ${percentage}%"></div>
+              <div class="vote-count">${voteCount} votes (${percentage}%)</div>
             </div>
           `;
           positionResults.appendChild(candidateResult);
