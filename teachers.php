@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     blobUpload($container, $file, json_encode($list));
-    echo "Candidate added successfully.<br><a href='teacher.html'>Back</a>";
+    echo "Candidate added successfully.<br><a href='teachers.html'>Back</a>";
 }
 ?>
+
