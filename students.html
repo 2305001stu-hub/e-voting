@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Voting</title>
+  <title>Student Voting - Student Voting System</title>
   <style>
     * {
       box-sizing: border-box;
@@ -18,6 +18,7 @@
       color: #fff;
       line-height: 1.6;
       min-height: 100vh;
+      padding-bottom: 20px;
     }
     
     .navbar {
@@ -53,11 +54,17 @@
       padding-bottom: 10px;
     }
     
-    .voting-form {
+    h3 {
+      color: #ffcc00;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
       background: rgba(255, 255, 255, 0.1);
-      padding: 25px;
       border-radius: 10px;
-      margin: 20px 0;
     }
     
     .form-group {
@@ -71,7 +78,8 @@
       color: #ffcc00;
     }
     
-    input[type="text"] {
+    input[type="text"],
+    input[type="number"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -80,78 +88,12 @@
       background: rgba(255, 255, 255, 0.9);
     }
     
-    .candidate-option {
-      display: block;
-      margin: 15px 0;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      border-left: 4px solid transparent;
-    }
-    
-    .candidate-option:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-left-color: #ffcc00;
-      transform: translateX(5px);
-    }
-    
-    .candidate-option input {
-      margin-right: 12px;
-      transform: scale(1.2);
-    }
-    
-    .candidate-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .candidate-name {
-      font-size: 18px;
-      font-weight: 500;
-    }
-    
-    .candidate-position {
-      font-size: 14px;
-      color: #ffcc00;
-      font-style: italic;
-    }
-    
-    button[type="submit"] {
-      background: #ffcc00;
-      color: black;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: block;
-      margin: 30px auto 0;
-      width: 250px;
-    }
-    
-    button[type="submit"]:hover {
-      background: #ffd633;
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
-    }
-    
-    button:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
     .buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
       justify-content: center;
-      margin: 30px 0 20px;
+      margin: 20px 0;
     }
     
     .btn {
@@ -163,6 +105,8 @@
       font-size: 16px;
       font-weight: bold;
       transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -184,13 +128,52 @@
       color: white;
     }
     
+    .candidate-list {
+      margin-top: 20px;
+    }
+    
+    .candidate-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid #ffcc00;
+    }
+    
+    .candidate-name {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    .vote-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .vote-btn:hover {
+      background: #388E3C;
+    }
+    
+    .vote-btn:disabled {
+      background: #9e9e9e;
+      cursor: not-allowed;
+    }
+    
     .message {
-      padding: 15px;
-      margin: 20px 0;
+      padding: 12px 15px;
+      margin: 15px 0;
       border-radius: 8px;
       text-align: center;
       font-weight: bold;
-      font-size: 16px;
     }
     
     .success {
@@ -211,36 +194,55 @@
       color: #2196F3;
     }
     
-    .warning {
-      background: rgba(255, 152, 0, 0.2);
-      border: 1px solid rgba(255, 152, 0, 0.5);
-      color: #ff9800;
-    }
-    
-    .election-status {
-      background: rgba(255, 204, 0, 0.1);
-      border: 1px solid #ffcc00;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
+    .voting-complete {
       text-align: center;
+      padding: 30px;
     }
     
-    .status-active {
+    .voting-complete h2 {
       color: #4CAF50;
-      font-weight: bold;
+      border-bottom: none;
     }
     
-    .status-ended {
-      color: #f44336;
-      font-weight: bold;
+    .voting-complete p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    .results-preview {
+      margin-top: 30px;
+    }
+    
+    .candidate-result {
+      margin-bottom: 15px;
+    }
+    
+    .vote-bar-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      height: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .vote-bar {
+      background: #4CAF50;
+      height: 100%;
+      transition: width 0.5s ease;
     }
     
     .vote-count {
-      text-align: center;
-      margin: 15px 0;
-      font-size: 16px;
-      color: #ffcc00;
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    }
+    
+    .hidden {
+      display: none;
     }
     
     @media (max-width: 768px) {
@@ -259,15 +261,10 @@
         max-width: 300px;
       }
       
-      .candidate-info {
+      .candidate-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
-      }
-      
-      button[type="submit"] {
-        width: 100%;
-        max-width: 300px;
+        gap: 10px;
       }
     }
   </style>
@@ -278,291 +275,338 @@
   </div>
   
   <div class="container">
-    <h2>Cast Your Vote</h2>
-    
-    <!-- Election Status -->
-    <div class="election-status">
-      <div id="electionStatus">Election Status: <span class="status-active">ACTIVE</span></div>
-      <div class="vote-count" id="totalVotesCount">Total Votes Cast: 0</div>
+    <!-- Student Login Section -->
+    <div id="loginSection">
+      <h2>Student Login</h2>
+      <div class="section">
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="studentId">Student ID</label>
+            <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" required>
+          </div>
+          <div class="buttons">
+            <button type="submit" class="btn btn-primary">Login to Vote</button>
+            <a href="index.html" class="btn btn-secondary">Back to Home</a>
+          </div>
+        </form>
+      </div>
+      <div id="loginMessage" class="message" style="display: none;"></div>
     </div>
     
-    <!-- Message display area -->
-    <div id="message" class="message" style="display: none;"></div>
+    <!-- Voting Section -->
+    <div id="votingSection" class="hidden">
+      <h2>Cast Your Vote</h2>
+      
+      <div class="section">
+        <div class="student-info">
+          <p>Welcome, Student ID: <strong id="displayStudentId"></strong></p>
+        </div>
+        
+        <div id="message" class="message" style="display: none;"></div>
+        
+        <div id="positionsContainer">
+          <!-- Positions and candidates will be dynamically added here -->
+        </div>
+        
+        <div class="buttons">
+          <button type="button" id="submitVoteBtn" class="btn btn-primary">Submit Vote</button>
+          <button type="button" id="logoutBtn" class="btn btn-secondary">Logout</button>
+        </div>
+      </div>
+    </div>
     
-    <div class="voting-form">
-      <form id="votingForm">
-        <!-- Student ID Input -->
-        <div class="form-group">
-          <label for="studentId">Student ID</label>
-          <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID (e.g., 20230001)" required>
+    <!-- Voting Complete Section -->
+    <div id="votingCompleteSection" class="hidden">
+      <div class="voting-complete">
+        <h2>Thank You for Voting!</h2>
+        <p>Your vote has been successfully recorded.</p>
+        <div class="buttons">
+          <button type="button" id="viewResultsBtn" class="btn btn-primary">View Results</button>
+          <a href="index.html" class="btn btn-secondary">Back to Home</a>
         </div>
         
-        <!-- Student Name Input -->
-        <div class="form-group">
-          <label for="studentName">Full Name</label>
-          <input type="text" id="studentName" name="studentName" placeholder="Enter your full name" required>
-        </div>
-        
-        <!-- Grade/Class Input -->
-        <div class="form-group">
-          <label for="studentGrade">Grade/Class</label>
-          <input type="text" id="studentGrade" name="studentGrade" placeholder="Enter your grade/class (e.g., Grade 10A)" required>
-        </div>
-        
-        <!-- Candidates Section -->
-        <div class="form-group">
-          <label style="margin-bottom: 15px;">Select Your Candidate:</label>
-          <div id="candidatesList">
-            <!-- Candidates will be loaded here dynamically -->
+        <div class="results-preview">
+          <h3>Current Results</h3>
+          <div id="resultsPreview">
+            <!-- Results will be displayed here -->
           </div>
         </div>
-        
-        <button type="submit" id="submitVote">Submit Vote</button>
-      </form>
-    </div>
-    
-    <div class="buttons">
-      <a href="index.html" class="btn btn-secondary">Back to Home</a>
-      <a href="results.html" class="btn btn-primary">View Live Results</a>
+      </div>
     </div>
   </div>
 
   <script>
     // DOM elements
+    const loginSection = document.getElementById('loginSection');
+    const votingSection = document.getElementById('votingSection');
+    const votingCompleteSection = document.getElementById('votingCompleteSection');
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const displayStudentId = document.getElementById('displayStudentId');
+    const positionsContainer = document.getElementById('positionsContainer');
+    const submitVoteBtn = document.getElementById('submitVoteBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const viewResultsBtn = document.getElementById('viewResultsBtn');
+    const resultsPreview = document.getElementById('resultsPreview');
     const messageDiv = document.getElementById('message');
-    const candidatesList = document.getElementById('candidatesList');
-    const votingForm = document.getElementById('votingForm');
-    const studentIdInput = document.getElementById('studentId');
-    const studentNameInput = document.getElementById('studentName');
-    const studentGradeInput = document.getElementById('studentGrade');
-    const submitVoteBtn = document.getElementById('submitVote');
-    const electionStatusElement = document.getElementById('electionStatus');
-    const totalVotesCountElement = document.getElementById('totalVotesCount');
-
-    // Election settings (could be managed by teachers)
-    let electionActive = true;
-    let electionEndTime = new Date();
-    electionEndTime.setDate(electionEndTime.getDate() + 7); // Election ends in 7 days
-
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      checkElectionStatus();
-      displayCandidates();
-      updateVoteCount();
+    
+    // Voting data
+    let selectedCandidates = {};
+    let currentStudentId = '';
+    
+    // Check if student has already voted
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
       
-      // Check for URL parameters (for messages)
-      const urlParams = new URLSearchParams(window.location.search);
-      const message = urlParams.get('message');
-      const success = urlParams.get('success');
+      const studentId = document.getElementById('studentId').value.trim().toUpperCase();
       
-      if (message) {
-        showMessage(message, success === 'true' ? 'success' : 'error');
+      if (!studentId) {
+        showLoginMessage('Please enter your student ID.', 'error');
+        return;
       }
       
-      // Update vote count every 10 seconds
-      setInterval(updateVoteCount, 10000);
-    });
-
-    // Check election status
-    function checkElectionStatus() {
-      const now = new Date();
+      // Check if student has already voted
+      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
       
-      if (now > electionEndTime) {
-        electionActive = false;
-        electionStatusElement.innerHTML = 'Election Status: <span class="status-ended">ENDED</span>';
-        submitVoteBtn.disabled = true;
-        submitVoteBtn.textContent = 'Voting Has Ended';
-        showMessage('The election has ended. Thank you for participating!', 'info');
-      } else {
-        // Calculate time remaining
-        const timeRemaining = electionEndTime - now;
-        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        
-        electionStatusElement.innerHTML = `Election Status: <span class="status-active">ACTIVE</span> (${days}d ${hours}h remaining)`;
+      if (votedStudents.includes(studentId)) {
+        // Student has already voted
+        showLoginMessage('You have already voted. Each student can only vote once.', 'error');
+        return;
       }
-    }
-
-    // Display candidates from shared data (teachers.html)
-    function displayCandidates() {
-      candidatesList.innerHTML = '';
       
-      // Get candidates from localStorage (shared with teachers.html)
+      // Check if voting is available (candidates exist)
       const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
       
       if (candidates.length === 0) {
-        candidatesList.innerHTML = `
-          <div class="message info">
-            No candidates available for voting at this time. 
-            Please check back later or contact your teacher.
-          </div>
-        `;
-        submitVoteBtn.disabled = true;
+        showLoginMessage('No voting positions available at this time. Please check back later.', 'info');
         return;
       }
       
-      if (!electionActive) {
-        submitVoteBtn.disabled = true;
-        submitVoteBtn.textContent = 'Voting Has Ended';
-      }
+      // Successful login
+      currentStudentId = studentId;
+      displayStudentId.textContent = studentId;
+      showVotingSection();
+      displayCandidates();
+    });
+    
+    // Logout button
+    logoutBtn.addEventListener('click', function() {
+      currentStudentId = '';
+      selectedCandidates = {};
+      showLoginSection();
+      loginForm.reset();
+    });
+    
+    // Submit vote button
+    submitVoteBtn.addEventListener('click', function() {
+      // Check if all positions have a selection
+      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+      const positions = [...new Set(candidates.map(c => c.position))];
       
-      candidates.forEach(candidate => {
-        const candidateOption = document.createElement('label');
-        candidateOption.className = 'candidate-option';
-        candidateOption.innerHTML = `
-          <input type="radio" name="vote" value="${candidate.id}" required>
-          <div class="candidate-info">
-            <div class="candidate-name">${candidate.name}</div>
-            <div class="candidate-position">${candidate.position}</div>
-          </div>
-        `;
-        candidatesList.appendChild(candidateOption);
-      });
-    }
-
-    // Update the total vote count display
-    function updateVoteCount() {
-      const votes = JSON.parse(localStorage.getItem('votes') || '[]');
-      totalVotesCountElement.textContent = `Total Votes Cast: ${votes.length}`;
-    }
-
-    // Handle form submission
-    votingForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      if (!electionActive) {
-        showMessage('Voting has ended. You can no longer submit votes.', 'error');
+      if (Object.keys(selectedCandidates).length !== positions.length) {
+        showMessage('Please vote for all positions before submitting.', 'error');
         return;
       }
       
-      const studentId = studentIdInput.value.trim();
-      const studentName = studentNameInput.value.trim();
-      const studentGrade = studentGradeInput.value.trim();
-      const selectedCandidate = document.querySelector('input[name="vote"]:checked');
+      // Record the vote
+      recordVote();
+    });
+    
+    // View results button
+    viewResultsBtn.addEventListener('click', function() {
+      window.location.href = 'results.html';
+    });
+    
+    // Function to display candidates by position
+    function displayCandidates() {
+      positionsContainer.innerHTML = '';
       
-      // Validation
-      if (!studentId) {
-        showMessage('Please enter your student ID.', 'error');
-        return;
-      }
-      
-      if (!studentName) {
-        showMessage('Please enter your full name.', 'error');
-        return;
-      }
-      
-      if (!studentGrade) {
-        showMessage('Please enter your grade/class.', 'error');
-        return;
-      }
-      
-      if (!selectedCandidate) {
-        showMessage('Please select a candidate to vote for.', 'error');
-        return;
-      }
-      
-      // Validate student ID format (example: at least 8 digits)
-      if (!/^\d{8,}$/.test(studentId)) {
-        showMessage('Please enter a valid student ID (8 or more digits).', 'error');
-        return;
-      }
-      
-      // Get existing data from localStorage (shared with teachers.html)
-      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
-      const votes = JSON.parse(localStorage.getItem('votes') || '[]');
-      const voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
       const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
       
-      // Check if student has already voted
-      if (votedStudents.includes(studentId)) {
-        showMessage('You have already voted. Each student can only vote once.', 'error');
+      if (candidates.length === 0) {
+        positionsContainer.innerHTML = '<div class="message info">No candidates available for voting at this time.</div>';
+        submitVoteBtn.disabled = true;
         return;
       }
       
-      // Process the vote
-      const candidateId = parseInt(selectedCandidate.value);
-      const candidate = candidates.find(c => c.id === candidateId);
+      // Group candidates by position
+      const positions = [...new Set(candidates.map(c => c.position))];
       
-      if (candidate) {
-        // Create vote record
-        const vote = {
-          id: Date.now(),
-          studentId: studentId,
-          studentName: studentName,
-          studentGrade: studentGrade,
-          candidateId: candidateId,
-          candidateName: candidate.name,
-          timestamp: new Date().toISOString()
-        };
+      positions.forEach(position => {
+        const positionSection = document.createElement('div');
+        positionSection.className = 'position-section';
+        positionSection.innerHTML = `<h3>${position}</h3>`;
         
-        // Update all data stores
-        votedStudents.push(studentId);
-        votes.push(vote);
+        const positionCandidates = candidates.filter(c => c.position === position);
         
+        positionCandidates.forEach(candidate => {
+          const candidateItem = document.createElement('div');
+          candidateItem.className = 'candidate-item';
+          candidateItem.innerHTML = `
+            <div class="candidate-name">${candidate.name}</div>
+            <button class="vote-btn" data-position="${position}" data-candidate-id="${candidate.id}">Vote</button>
+          `;
+          positionSection.appendChild(candidateItem);
+        });
+        
+        positionsContainer.appendChild(positionSection);
+      });
+      
+      // Add event listeners to vote buttons
+      document.querySelectorAll('.vote-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const position = this.getAttribute('data-position');
+          const candidateId = this.getAttribute('data-candidate-id');
+          
+          // Update selection for this position
+          selectedCandidates[position] = candidateId;
+          
+          // Update button states
+          updateButtonStates(position, candidateId);
+          
+          showMessage(`You selected a candidate for ${position}.`, 'info');
+        });
+      });
+    }
+    
+    // Function to update button states when a candidate is selected
+    function updateButtonStates(selectedPosition, selectedCandidateId) {
+      // Reset all buttons for this position to default state
+      document.querySelectorAll(`.vote-btn[data-position="${selectedPosition}"]`).forEach(button => {
+        button.textContent = 'Vote';
+        button.disabled = false;
+      });
+      
+      // Mark the selected candidate
+      const selectedButton = document.querySelector(`.vote-btn[data-candidate-id="${selectedCandidateId}"]`);
+      selectedButton.textContent = 'Selected ✓';
+      selectedButton.disabled = true;
+    }
+    
+    // Function to record the vote
+    function recordVote() {
+      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
+      let voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+      let votes = JSON.parse(localStorage.getItem('votes') || '[]');
+      
+      // Record votes for each position
+      Object.keys(selectedCandidates).forEach(position => {
+        const candidateId = selectedCandidates[position];
+        
+        // Add to vote counts
         if (!voteCounts[candidateId]) {
           voteCounts[candidateId] = 0;
         }
         voteCounts[candidateId]++;
         
-        // Save to localStorage (shared with teachers.html)
-        localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
-        localStorage.setItem('votes', JSON.stringify(votes));
-        localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
-        
-        // Show success message
-        showMessage(`Thank you for voting, ${studentName}! Your vote for ${candidate.name} has been recorded.`, 'success');
-        
-        // Update UI
-        updateVoteCount();
-        
-        // Reset form
-        votingForm.reset();
-        
-        // Disable voting for this student
-        submitVoteBtn.disabled = true;
-        submitVoteBtn.textContent = 'Vote Submitted';
-        
-        // Redirect to results after 3 seconds
-        setTimeout(() => {
-          window.location.href = 'results.html';
-        }, 3000);
-      } else {
-        showMessage('Error processing your vote. Please try again.', 'error');
+        // Add to votes list
+        votes.push({
+          id: Date.now() + Math.random(), // Simple unique ID
+          studentId: currentStudentId,
+          candidateId: parseInt(candidateId),
+          position: position,
+          timestamp: new Date().toISOString()
+        });
+      });
+      
+      // Add student to voted students list
+      votedStudents.push(currentStudentId);
+      
+      // Save to localStorage
+      localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
+      localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+      localStorage.setItem('votes', JSON.stringify(votes));
+      
+      // Show completion screen
+      showVotingCompleteSection();
+      displayResultsPreview();
+    }
+    
+    // Function to display results preview
+    function displayResultsPreview() {
+      resultsPreview.innerHTML = '';
+      
+      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+      const voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+      
+      if (candidates.length === 0) {
+        resultsPreview.innerHTML = '<div class="message info">No results available.</div>';
+        return;
       }
-    });
-
-    // Function to show messages
+      
+      // Group candidates by position
+      const positions = [...new Set(candidates.map(c => c.position))];
+      
+      positions.forEach(position => {
+        const positionResults = document.createElement('div');
+        positionResults.innerHTML = `<h4>${position}</h4>`;
+        
+        const positionCandidates = candidates.filter(c => c.position === position);
+        
+        positionCandidates.forEach(candidate => {
+          const voteCount = voteCounts[candidate.id] || 0;
+          
+          const candidateResult = document.createElement('div');
+          candidateResult.className = 'candidate-result';
+          candidateResult.innerHTML = `
+            <div class="candidate-name">${candidate.name}</div>
+            <div class="vote-bar-container">
+              <div class="vote-bar" style="width: ${voteCount * 10}%"></div>
+              <div class="vote-count">${voteCount} votes</div>
+            </div>
+          `;
+          positionResults.appendChild(candidateResult);
+        });
+        
+        resultsPreview.appendChild(positionResults);
+      });
+    }
+    
+    // Function to show login section
+    function showLoginSection() {
+      loginSection.classList.remove('hidden');
+      votingSection.classList.add('hidden');
+      votingCompleteSection.classList.add('hidden');
+    }
+    
+    // Function to show voting section
+    function showVotingSection() {
+      loginSection.classList.add('hidden');
+      votingSection.classList.remove('hidden');
+      votingCompleteSection.classList.add('hidden');
+    }
+    
+    // Function to show voting complete section
+    function showVotingCompleteSection() {
+      loginSection.classList.add('hidden');
+      votingSection.classList.add('hidden');
+      votingCompleteSection.classList.remove('hidden');
+    }
+    
+    // Function to show messages in login section
+    function showLoginMessage(text, type) {
+      loginMessage.textContent = text;
+      loginMessage.className = `message ${type}`;
+      loginMessage.style.display = 'block';
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        loginMessage.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Function to show messages in voting section
     function showMessage(text, type) {
       messageDiv.textContent = text;
       messageDiv.className = `message ${type}`;
       messageDiv.style.display = 'block';
       
-      // Scroll to message
-      messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Hide message after 5 seconds (except for success messages with redirect)
-      if (type !== 'success') {
-        setTimeout(() => {
-          messageDiv.style.display = 'none';
-        }, 5000);
-      }
+      // Hide message after 3 seconds
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 3000);
     }
-
-    // Check if student has already voted when they enter their ID
-    studentIdInput.addEventListener('blur', function() {
-      const studentId = this.value.trim();
-      if (studentId) {
-        const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
-        if (votedStudents.includes(studentId)) {
-          showMessage('This student ID has already voted. Each student can only vote once.', 'warning');
-          submitVoteBtn.disabled = true;
-          submitVoteBtn.textContent = 'Already Voted';
-        } else {
-          submitVoteBtn.disabled = !electionActive;
-          submitVoteBtn.textContent = electionActive ? 'Submit Vote' : 'Voting Has Ended';
-        }
-      }
-    });
   </script>
 </body>
 </html>
