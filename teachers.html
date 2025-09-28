@@ -40,7 +40,7 @@
       padding: 30px;
       border-radius: 15px;
       width: 90%;
-      max-width: 900px;
+      max-width: 1200px;
       margin: 30px auto;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
@@ -57,6 +57,12 @@
       font-size: 28px;
       border-bottom: 2px solid #ffcc00;
       padding-bottom: 10px;
+    }
+    
+    h3 {
+      color: #ffcc00;
+      margin-bottom: 15px;
+      font-size: 22px;
     }
     
     .section {
@@ -137,11 +143,13 @@
       color: white;
     }
     
-    .candidates-list {
+    .candidates-list,
+    .votes-list {
       margin-top: 20px;
     }
     
-    .candidate-item {
+    .candidate-item,
+    .vote-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -152,12 +160,14 @@
       border-left: 4px solid #ffcc00;
     }
     
-    .candidate-name {
+    .candidate-name,
+    .vote-info {
       font-size: 18px;
       font-weight: 500;
     }
     
-    .candidate-actions {
+    .candidate-actions,
+    .vote-actions {
       display: flex;
       gap: 10px;
     }
@@ -248,6 +258,62 @@
       display: none;
     }
     
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border-left: 4px solid #ffcc00;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #ffcc00;
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 16px;
+      color: #ddd;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      transition: background 0.3s;
+    }
+    
+    .tab.active {
+      background: rgba(255, 204, 0, 0.3);
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -264,13 +330,15 @@
         max-width: 300px;
       }
       
-      .candidate-item {
+      .candidate-item,
+      .vote-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
       }
       
-      .candidate-actions {
+      .candidate-actions,
+      .vote-actions {
         width: 100%;
         justify-content: flex-end;
       }
@@ -279,6 +347,16 @@
         flex-direction: column;
         gap: 10px;
         text-align: center;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        margin-right: 0;
+        margin-bottom: 5px;
+        border-radius: 5px;
       }
     }
   </style>
@@ -323,60 +401,117 @@
     <!-- Success/Error Messages -->
     <div id="message" class="message" style="display: none;"></div>
     
-    <!-- Add Candidate Section -->
-    <div class="section">
-      <h2>Add Candidate</h2>
-      <form id="addCandidateForm">
-        <div class="form-group">
-          <label for="candidateName">Candidate Name</label>
-          <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
-        </div>
-        <div class="buttons">
-          <button type="submit" class="btn btn-primary">Add Candidate</button>
-          <button type="button" id="refreshBtn" class="btn btn-secondary">Refresh List</button>
-        </div>
-      </form>
-    </div>
-    
-    <!-- Candidates List Section -->
-    <div class="section">
-      <h2>Current Candidates</h2>
-      <div id="candidatesList" class="candidates-list">
-        <!-- Candidate items will be dynamically added here -->
+    <!-- Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number" id="totalCandidates">0</span>
+        <span class="stat-label">Total Candidates</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="totalVotes">0</span>
+        <span class="stat-label">Total Votes</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="votedStudents">0</span>
+        <span class="stat-label">Voted Students</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="leadingCandidate">-</span>
+        <span class="stat-label">Leading Candidate</span>
       </div>
     </div>
     
-    <!-- Danger Zone Section -->
-    <div class="section danger-zone">
-      <h3>Danger Zone</h3>
-      <p>Warning: These actions cannot be undone. Use with caution.</p>
-      <div class="buttons">
-        <button type="button" id="deleteAllVotesBtn" class="btn btn-danger">Delete All Votes</button>
-        <button type="button" id="deleteAllCandidatesBtn" class="btn btn-danger">Delete All Candidates</button>
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="candidates">Manage Candidates</div>
+      <div class="tab" data-tab="votes">View Votes</div>
+      <div class="tab" data-tab="danger">Danger Zone</div>
+    </div>
+    
+    <!-- Candidates Tab -->
+    <div class="tab-content active" id="candidatesTab">
+      <!-- Add Candidate Section -->
+      <div class="section">
+        <h2>Add Candidate</h2>
+        <form id="addCandidateForm">
+          <div class="form-group">
+            <label for="candidateName">Candidate Name</label>
+            <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
+          </div>
+          <div class="form-group">
+            <label for="candidatePosition">Position</label>
+            <input type="text" id="candidatePosition" name="position" placeholder="Enter position (e.g., Class President)" required>
+          </div>
+          <div class="buttons">
+            <button type="submit" class="btn btn-primary">Add Candidate</button>
+            <button type="button" id="refreshCandidatesBtn" class="btn btn-secondary">Refresh List</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Candidates List Section -->
+      <div class="section">
+        <h2>Current Candidates</h2>
+        <div id="candidatesList" class="candidates-list">
+          <!-- Candidate items will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Votes Tab -->
+    <div class="tab-content" id="votesTab">
+      <div class="section">
+        <h2>Vote Management</h2>
+        <div class="buttons">
+          <button type="button" id="refreshVotesBtn" class="btn btn-secondary">Refresh Votes</button>
+          <button type="button" id="exportVotesBtn" class="btn btn-primary">Export Votes to CSV</button>
+        </div>
+        
+        <h3>Voting Results</h3>
+        <div id="resultsChart">
+          <!-- Results chart will be displayed here -->
+        </div>
+        
+        <h3>Individual Votes</h3>
+        <div id="votesList" class="votes-list">
+          <!-- Vote items will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Danger Zone Tab -->
+    <div class="tab-content" id="dangerTab">
+      <div class="section danger-zone">
+        <h3>Danger Zone</h3>
+        <p>Warning: These actions cannot be undone. Use with caution.</p>
+        <div class="buttons">
+          <button type="button" id="deleteAllVotesBtn" class="btn btn-danger">Delete All Votes</button>
+          <button type="button" id="deleteAllCandidatesBtn" class="btn btn-danger">Delete All Candidates</button>
+          <button type="button" id="resetSystemBtn" class="btn btn-danger">Reset Entire System</button>
+        </div>
       </div>
     </div>
     
     <!-- Navigation Buttons -->
     <div class="buttons">
       <a href="index.html" class="btn btn-secondary">Back to Home</a>
-      <a href="results.php" class="btn btn-primary">View Results</a>
+      <a href="results.html" class="btn btn-primary">Public Results</a>
     </div>
   </div>
 
   <script>
-    // Teacher credentials (in a real app, this would be stored securely on the server)
+    // Teacher credentials
     const teacherCredentials = [
       { username: "admin", password: "admin123", name: "Administrator" },
       { username: "teacher1", password: "teacher123", name: "Ms. Johnson" },
       { username: "teacher2", password: "teacher456", name: "Mr. Smith" }
     ];
     
-    // Sample candidate data (in a real app, this would come from a server/database)
-    let candidates = [
-      { id: 1, name: "John Smith" },
-      { id: 2, name: "Sarah Johnson" },
-      { id: 3, name: "Michael Brown" }
-    ];
+    // Initialize data from localStorage or set defaults
+    let candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+    let votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
+    let voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+    let votes = JSON.parse(localStorage.getItem('votes') || '[]');
     
     // DOM elements
     const loginSection = document.getElementById('loginSection');
@@ -385,13 +520,35 @@
     const loginMessage = document.getElementById('loginMessage');
     const teacherNameElement = document.getElementById('teacherName');
     const logoutBtn = document.getElementById('logoutBtn');
+    const messageDiv = document.getElementById('message');
+    
+    // Candidate management
     const addCandidateForm = document.getElementById('addCandidateForm');
     const candidateNameInput = document.getElementById('candidateName');
+    const candidatePositionInput = document.getElementById('candidatePosition');
     const candidatesList = document.getElementById('candidatesList');
-    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshCandidatesBtn = document.getElementById('refreshCandidatesBtn');
+    
+    // Vote management
+    const votesList = document.getElementById('votesList');
+    const refreshVotesBtn = document.getElementById('refreshVotesBtn');
+    const exportVotesBtn = document.getElementById('exportVotesBtn');
+    const resultsChart = document.getElementById('resultsChart');
+    
+    // Danger zone
     const deleteAllVotesBtn = document.getElementById('deleteAllVotesBtn');
     const deleteAllCandidatesBtn = document.getElementById('deleteAllCandidatesBtn');
-    const messageDiv = document.getElementById('message');
+    const resetSystemBtn = document.getElementById('resetSystemBtn');
+    
+    // Statistics
+    const totalCandidatesElement = document.getElementById('totalCandidates');
+    const totalVotesElement = document.getElementById('totalVotes');
+    const votedStudentsElement = document.getElementById('votedStudents');
+    const leadingCandidateElement = document.getElementById('leadingCandidate');
+    
+    // Tabs
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
     
     // Check if user is already logged in
     checkLoginStatus();
@@ -434,46 +591,119 @@
       e.preventDefault();
       
       const candidateName = candidateNameInput.value.trim();
+      const candidatePosition = candidatePositionInput.value.trim();
       
-      if (candidateName) {
-        // In a real app, you would send this to the server
+      if (candidateName && candidatePosition) {
         const newCandidate = {
-          id: Date.now(), // Simple ID generation
-          name: candidateName
+          id: Date.now(),
+          name: candidateName,
+          position: candidatePosition
         };
         
         candidates.push(newCandidate);
+        saveCandidates();
         displayCandidates();
+        updateStatistics();
         showMessage(`Candidate "${candidateName}" added successfully!`, 'success');
         candidateNameInput.value = '';
+        candidatePositionInput.value = '';
       } else {
-        showMessage('Please enter a candidate name.', 'error');
+        showMessage('Please enter both candidate name and position.', 'error');
       }
     });
     
-    // Refresh list button
-    refreshBtn.addEventListener('click', function() {
-      // In a real app, you would fetch the latest data from the server
+    // Refresh candidates button
+    refreshCandidatesBtn.addEventListener('click', function() {
       displayCandidates();
       showMessage('Candidate list refreshed.', 'info');
+    });
+    
+    // Refresh votes button
+    refreshVotesBtn.addEventListener('click', function() {
+      displayVotes();
+      displayResultsChart();
+      updateStatistics();
+      showMessage('Votes refreshed.', 'info');
+    });
+    
+    // Export votes button
+    exportVotesBtn.addEventListener('click', function() {
+      exportVotesToCSV();
     });
     
     // Delete all votes button
     deleteAllVotesBtn.addEventListener('click', function() {
       if (confirm('Are you sure you want to delete all votes? This action cannot be undone.')) {
-        // In a real app, you would send a request to the server to delete all votes
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        saveVotes();
+        updateStatistics();
+        displayVotes();
+        displayResultsChart();
         showMessage('All votes have been deleted.', 'success');
       }
     });
     
     // Delete all candidates button
     deleteAllCandidatesBtn.addEventListener('click', function() {
-      if (confirm('Are you sure you want to delete all candidates? This action cannot be undone.')) {
-        // In a real app, you would send a request to the server to delete all candidates
+      if (confirm('Are you sure you want to delete all candidates? This will also delete all votes. This action cannot be undone.')) {
         candidates = [];
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        saveCandidates();
+        saveVotes();
+        updateStatistics();
         displayCandidates();
-        showMessage('All candidates have been deleted.', 'success');
+        displayVotes();
+        displayResultsChart();
+        showMessage('All candidates and votes have been deleted.', 'success');
       }
+    });
+    
+    // Reset system button
+    resetSystemBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to reset the entire system? This will delete all candidates, votes, and settings. This action cannot be undone.')) {
+        localStorage.removeItem('candidates');
+        localStorage.removeItem('votedStudents');
+        localStorage.removeItem('voteCounts');
+        localStorage.removeItem('votes');
+        candidates = [];
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        updateStatistics();
+        displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        showMessage('System has been reset to default state.', 'success');
+      }
+    });
+    
+    // Tab functionality
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+          if (content.id === `${tabId}Tab`) {
+            content.classList.add('active');
+          }
+        });
+        
+        // Refresh data when switching to votes tab
+        if (tabId === 'votes') {
+          displayVotes();
+          displayResultsChart();
+        }
+      });
     });
     
     // Function to check login status
@@ -494,6 +724,9 @@
       loginSection.classList.add('hidden');
       teacherPanel.classList.remove('hidden');
       displayCandidates();
+      displayVotes();
+      displayResultsChart();
+      updateStatistics();
     }
     
     // Function to hide teacher panel
@@ -515,7 +748,7 @@
         const candidateItem = document.createElement('div');
         candidateItem.className = 'candidate-item';
         candidateItem.innerHTML = `
-          <div class="candidate-name">${candidate.name}</div>
+          <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
           <div class="candidate-actions">
             <button class="delete-btn" data-id="${candidate.id}">Delete</button>
           </div>
@@ -534,12 +767,217 @@
     
     // Function to delete a candidate
     function deleteCandidate(id) {
-      if (confirm('Are you sure you want to delete this candidate?')) {
-        // In a real app, you would send a request to the server to delete the candidate
+      if (confirm('Are you sure you want to delete this candidate? This will also delete all votes for this candidate.')) {
         candidates = candidates.filter(candidate => candidate.id !== id);
+        
+        // Remove votes for this candidate
+        votes = votes.filter(vote => vote.candidateId !== id);
+        
+        // Update vote counts
+        if (voteCounts[id]) {
+          delete voteCounts[id];
+        }
+        
+        saveCandidates();
+        saveVotes();
         displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        updateStatistics();
         showMessage('Candidate deleted successfully.', 'success');
       }
+    }
+    
+    // Function to display votes
+    function displayVotes() {
+      votesList.innerHTML = '';
+      
+      if (votes.length === 0) {
+        votesList.innerHTML = '<div class="message info">No votes have been cast yet.</div>';
+        return;
+      }
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const voteItem = document.createElement('div');
+        voteItem.className = 'vote-item';
+        voteItem.innerHTML = `
+          <div class="vote-info">
+            <strong>Student ID:</strong> ${vote.studentId} | 
+            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} | 
+            <strong>Time:</strong> ${new Date(vote.timestamp).toLocaleString()}
+          </div>
+          <div class="vote-actions">
+            <button class="delete-btn" data-vote-id="${vote.id}">Delete</button>
+          </div>
+        `;
+        votesList.appendChild(voteItem);
+      });
+      
+      // Add event listeners to delete vote buttons
+      document.querySelectorAll('.vote-actions .delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const voteId = this.getAttribute('data-vote-id');
+          deleteVote(voteId);
+        });
+      });
+    }
+    
+    // Function to delete a vote
+    function deleteVote(voteId) {
+      if (confirm('Are you sure you want to delete this vote?')) {
+        const voteIndex = votes.findIndex(v => v.id === voteId);
+        if (voteIndex !== -1) {
+          const vote = votes[voteIndex];
+          
+          // Remove from votedStudents
+          const studentIndex = votedStudents.indexOf(vote.studentId);
+          if (studentIndex !== -1) {
+            votedStudents.splice(studentIndex, 1);
+          }
+          
+          // Update vote counts
+          if (voteCounts[vote.candidateId]) {
+            voteCounts[vote.candidateId]--;
+            if (voteCounts[vote.candidateId] <= 0) {
+              delete voteCounts[vote.candidateId];
+            }
+          }
+          
+          // Remove the vote
+          votes.splice(voteIndex, 1);
+          
+          saveVotes();
+          displayVotes();
+          displayResultsChart();
+          updateStatistics();
+          showMessage('Vote deleted successfully.', 'success');
+        }
+      }
+    }
+    
+    // Function to display results chart
+    function displayResultsChart() {
+      resultsChart.innerHTML = '';
+      
+      if (candidates.length === 0) {
+        resultsChart.innerHTML = '<div class="message info">No candidates available to display results.</div>';
+        return;
+      }
+      
+      let chartHTML = '<div class="results-container">';
+      
+      candidates.forEach(candidate => {
+        const voteCount = voteCounts[candidate.id] || 0;
+        const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
+        const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+        
+        chartHTML += `
+          <div class="candidate-result">
+            <div class="candidate-name">${candidate.name}</div>
+            <div class="vote-bar-container">
+              <div class="vote-bar" style="width: ${percentage}%"></div>
+              <div class="vote-count">${voteCount} votes (${percentage}%)</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      chartHTML += '</div>';
+      resultsChart.innerHTML = chartHTML;
+      
+      // Add CSS for the chart
+      const style = document.createElement('style');
+      style.textContent = `
+        .candidate-result {
+          margin-bottom: 15px;
+        }
+        .vote-bar-container {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 5px;
+          height: 30px;
+          position: relative;
+          overflow: hidden;
+        }
+        .vote-bar {
+          background: #4CAF50;
+          height: 100%;
+          transition: width 0.5s ease;
+        }
+        .vote-count {
+          position: absolute;
+          top: 50%;
+          left: 10px;
+          transform: translateY(-50%);
+          font-weight: bold;
+          color: white;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+      `;
+      resultsChart.appendChild(style);
+    }
+    
+    // Function to update statistics
+    function updateStatistics() {
+      totalCandidatesElement.textContent = candidates.length;
+      totalVotesElement.textContent = votes.length;
+      votedStudentsElement.textContent = votedStudents.length;
+      
+      // Find leading candidate
+      let leadingCandidate = '-';
+      let maxVotes = 0;
+      
+      candidates.forEach(candidate => {
+        const votesForCandidate = voteCounts[candidate.id] || 0;
+        if (votesForCandidate > maxVotes) {
+          maxVotes = votesForCandidate;
+          leadingCandidate = candidate.name;
+        }
+      });
+      
+      leadingCandidateElement.textContent = leadingCandidate;
+    }
+    
+    // Function to export votes to CSV
+    function exportVotesToCSV() {
+      if (votes.length === 0) {
+        showMessage('No votes to export.', 'error');
+        return;
+      }
+      
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student ID,Candidate,Position,Timestamp\n";
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const candidateName = candidate ? candidate.name : 'Unknown';
+        const position = candidate ? candidate.position : 'Unknown';
+        const timestamp = new Date(vote.timestamp).toLocaleString();
+        
+        csvContent += `"${vote.studentId}","${candidateName}","${position}","${timestamp}"\n`;
+      });
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "student_votes.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Votes exported successfully.', 'success');
+    }
+    
+    // Function to save candidates to localStorage
+    function saveCandidates() {
+      localStorage.setItem('candidates', JSON.stringify(candidates));
+    }
+    
+    // Function to save votes to localStorage
+    function saveVotes() {
+      localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
+      localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+      localStorage.setItem('votes', JSON.stringify(votes));
     }
     
     // Function to show messages in teacher panel
