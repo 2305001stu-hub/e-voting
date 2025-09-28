@@ -1,0 +1,24 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7BVeeelL1mKOuOaVSNeFrUKkKQPnLJH7a_w&s') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+}
+
+.menu {
+  margin-top: 50px;
+}
+
+.menu a {
+  display: block;
+  padding: 15px;
+  margin: 10px;
+  background: #333;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+.menu a:hover {
+  background: #555;
+}

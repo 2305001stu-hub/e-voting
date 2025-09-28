@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Voting</title>
+</head>
+<body>
+  <h2>Vote for a Candidate</h2>
+  <form action="vote.php" method="POST">
+    <?php
+      include 'azure_blob.php';
+      $data = blobDownload("evote-data", "candidates.json");
+      $candidates = $data ? json_decode($data, true) : [];
+      foreach($candidates as $c) {
+          echo "<input type='radio' name='vote' value='$c' required> $c <br>";
+      }
+    ?>
+    <button type="submit">Submit Vote</button>
+  </form>
+  <br>
+  <a href="index.html">Back</a>
+</body>
+</html>
