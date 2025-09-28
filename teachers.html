@@ -45,6 +45,11 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+    }
+    
     h2 {
       color: #ffcc00;
       margin-bottom: 20px;
@@ -72,7 +77,8 @@
       color: #ffcc00;
     }
     
-    input[type="text"] {
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -208,6 +214,40 @@
       margin-bottom: 15px;
     }
     
+    .teacher-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+    
+    .teacher-name {
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    
+    .logout-btn {
+      background: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: #f57c00;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -234,6 +274,12 @@
         width: 100%;
         justify-content: flex-end;
       }
+      
+      .teacher-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -242,7 +288,38 @@
     <h1>Teacher Panel - Student Voting System</h1>
   </div>
   
-  <div class="container">
+  <!-- Login Section -->
+  <div class="container login-container" id="loginSection">
+    <h2>Teacher Login</h2>
+    <div class="section">
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="buttons">
+          <button type="submit" class="btn btn-primary">Login</button>
+          <a href="index.html" class="btn btn-secondary">Back to Home</a>
+        </div>
+      </form>
+    </div>
+    <div id="loginMessage" class="message" style="display: none;"></div>
+  </div>
+  
+  <!-- Teacher Panel (Initially Hidden) -->
+  <div class="container hidden" id="teacherPanel">
+    <!-- Teacher Info -->
+    <div class="teacher-info">
+      <div>
+        Welcome, <span class="teacher-name" id="teacherName">Teacher</span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+    
     <!-- Success/Error Messages -->
     <div id="message" class="message" style="display: none;"></div>
     
@@ -287,6 +364,13 @@
   </div>
 
   <script>
+    // Teacher credentials (in a real app, this would be stored securely on the server)
+    const teacherCredentials = [
+      { username: "admin", password: "admin123", name: "Administrator" },
+      { username: "teacher1", password: "teacher123", name: "Ms. Johnson" },
+      { username: "teacher2", password: "teacher456", name: "Mr. Smith" }
+    ];
+    
     // Sample candidate data (in a real app, this would come from a server/database)
     let candidates = [
       { id: 1, name: "John Smith" },
@@ -295,6 +379,12 @@
     ];
     
     // DOM elements
+    const loginSection = document.getElementById('loginSection');
+    const teacherPanel = document.getElementById('teacherPanel');
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const teacherNameElement = document.getElementById('teacherName');
+    const logoutBtn = document.getElementById('logoutBtn');
     const addCandidateForm = document.getElementById('addCandidateForm');
     const candidateNameInput = document.getElementById('candidateName');
     const candidatesList = document.getElementById('candidatesList');
@@ -303,8 +393,41 @@
     const deleteAllCandidatesBtn = document.getElementById('deleteAllCandidatesBtn');
     const messageDiv = document.getElementById('message');
     
-    // Display initial candidates
-    displayCandidates();
+    // Check if user is already logged in
+    checkLoginStatus();
+    
+    // Login form submission
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      
+      const teacher = teacherCredentials.find(t => 
+        t.username === username && t.password === password
+      );
+      
+      if (teacher) {
+        // Successful login
+        localStorage.setItem('teacherLoggedIn', 'true');
+        localStorage.setItem('teacherName', teacher.name);
+        teacherNameElement.textContent = teacher.name;
+        showPanel();
+        showLoginMessage(`Welcome, ${teacher.name}!`, 'success');
+      } else {
+        // Failed login
+        showLoginMessage('Invalid username or password. Please try again.', 'error');
+      }
+    });
+    
+    // Logout button
+    logoutBtn.addEventListener('click', function() {
+      localStorage.removeItem('teacherLoggedIn');
+      localStorage.removeItem('teacherName');
+      hidePanel();
+      loginForm.reset();
+      showLoginMessage('You have been logged out successfully.', 'info');
+    });
     
     // Add candidate form submission
     addCandidateForm.addEventListener('submit', function(e) {
@@ -353,6 +476,32 @@
       }
     });
     
+    // Function to check login status
+    function checkLoginStatus() {
+      const isLoggedIn = localStorage.getItem('teacherLoggedIn');
+      const name = localStorage.getItem('teacherName');
+      
+      if (isLoggedIn === 'true' && name) {
+        teacherNameElement.textContent = name;
+        showPanel();
+      } else {
+        hidePanel();
+      }
+    }
+    
+    // Function to show teacher panel
+    function showPanel() {
+      loginSection.classList.add('hidden');
+      teacherPanel.classList.remove('hidden');
+      displayCandidates();
+    }
+    
+    // Function to hide teacher panel
+    function hidePanel() {
+      loginSection.classList.remove('hidden');
+      teacherPanel.classList.add('hidden');
+    }
+    
     // Function to display candidates
     function displayCandidates() {
       candidatesList.innerHTML = '';
@@ -393,7 +542,7 @@
       }
     }
     
-    // Function to show messages
+    // Function to show messages in teacher panel
     function showMessage(text, type) {
       messageDiv.textContent = text;
       messageDiv.className = `message ${type}`;
@@ -402,6 +551,18 @@
       // Hide message after 5 seconds
       setTimeout(() => {
         messageDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Function to show messages in login section
+    function showLoginMessage(text, type) {
+      loginMessage.textContent = text;
+      loginMessage.className = `message ${type}`;
+      loginMessage.style.display = 'block';
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        loginMessage.style.display = 'none';
       }, 5000);
     }
   </script>
