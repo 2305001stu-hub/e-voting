@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Classroom E-Voting</title>
- <style>
+  <meta charset="UTF-8">
+  <title>E-Voting System - Classroom</title>
+  <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -58,13 +59,42 @@
   </style>
 </head>
 <body>
-  <h1>Welcome to Classroom E-Voting</h1>
-  <div class="menu">
-    <a href="teachers.html">Teacher Panel</a>
-    <a href="students.html">Student Voting</a>
-    <a href="results.html">View Results</a>
+
+  <div class="navbar">
+    <h1>Classroom E-Voting System</h1>
   </div>
+
+  <div class="container">
+    <h2>Welcome to the Online Voting Platform</h2>
+    <p>
+      This system allows teachers to manage candidates and students to cast votes securely with unique IDs.
+      Please follow the guidelines below before proceeding.
+    </p>
+
+    <div class="buttons">
+      <a href="teachers.html">Teachers Tab</a>
+      <a href="students.html">Students Tab</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Guidelines for Teachers</h2>
+    <ul>
+      <li>Login using your credentials to access the teacher panel.</li>
+      <li>Add candidates with a <b>unique Candidate ID</b>.</li>
+      <li>You can delete or update candidates before voting begins.</li>
+      <li>Ensure all candidates are added before students start voting.</li>
+    </ul>
+
+    <h2>Guidelines for Students</h2>
+    <ul>
+      <li>Each student has a <b>unique Student ID</b>.</li>
+      <li>You must enter your ID to vote.</li>
+      <li>You can only vote once. After voting, your ID will be locked.</li>
+      <li>Your vote is <b>confidential</b> and will not be displayed.</li>
+      <li>After all votes are cast, results will be available to the teacher.</li>
+    </ul>
+  </div>
+
 </body>
 </html>
-
-
