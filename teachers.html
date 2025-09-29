@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Voting - Student Voting System</title>
+  <title>Teacher Panel - Student Voting System</title>
   <style>
     * {
       box-sizing: border-box;
@@ -45,6 +45,11 @@
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+    }
+    
     h2 {
       color: #ffcc00;
       margin-bottom: 20px;
@@ -58,12 +63,6 @@
       color: #ffcc00;
       margin-bottom: 15px;
       font-size: 22px;
-    }
-    
-    h4 {
-      color: #ffcc00;
-      margin: 15px 0 10px 0;
-      font-size: 18px;
     }
     
     .section {
@@ -84,7 +83,9 @@
       color: #ffcc00;
     }
     
-    input[type="text"] {
+    input[type="text"],
+    input[type="password"],
+    input[type="number"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -128,23 +129,28 @@
       color: white;
     }
     
+    .btn-danger {
+      background: #f44336;
+      color: white;
+    }
+    
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+    
     .btn-secondary {
       background: #9e9e9e;
       color: white;
     }
     
-    .candidate-list {
+    .candidates-list,
+    .votes-list {
       margin-top: 20px;
     }
     
-    .position-section {
-      margin-bottom: 25px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-    }
-    
-    .candidate-item {
+    .candidate-item,
+    .vote-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -155,33 +161,42 @@
       border-left: 4px solid #ffcc00;
     }
     
-    .candidate-name {
+    .candidate-name,
+    .vote-info {
       font-size: 18px;
       font-weight: 500;
     }
     
-    .vote-btn {
-      background: #4CAF50;
+    .candidate-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .candidate-roll {
+      font-size: 14px;
+      color: #ffcc00;
+      margin-top: 5px;
+    }
+    
+    .candidate-actions,
+    .vote-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .delete-btn {
+      background: #f44336;
       color: white;
       border: none;
       border-radius: 5px;
-      padding: 8px 15px;
+      padding: 6px 12px;
       cursor: pointer;
       font-size: 14px;
       transition: background 0.3s;
     }
     
-    .vote-btn:hover {
-      background: #388E3C;
-    }
-    
-    .vote-btn:disabled {
-      background: #9e9e9e;
-      cursor: not-allowed;
-    }
-    
-    .vote-btn.selected {
-      background: #2196F3;
+    .delete-btn:hover {
+      background: #d32f2f;
     }
     
     .message {
@@ -210,66 +225,51 @@
       color: #2196F3;
     }
     
-    .voting-complete {
+    .danger-zone {
+      border: 2px solid #f44336;
+      background: rgba(244, 67, 54, 0.1);
+    }
+    
+    .danger-zone h3 {
+      color: #f44336;
       text-align: center;
-      padding: 30px;
-    }
-    
-    .voting-complete h2 {
-      color: #4CAF50;
-      border-bottom: none;
-    }
-    
-    .voting-complete p {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-    
-    .results-preview {
-      margin-top: 30px;
-    }
-    
-    .candidate-result {
       margin-bottom: 15px;
     }
     
-    .vote-bar-container {
+    .teacher-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px 15px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      height: 30px;
-      position: relative;
-      overflow: hidden;
+      border-radius: 8px;
     }
     
-    .vote-bar {
-      background: #4CAF50;
-      height: 100%;
-      transition: width 0.5s ease;
-    }
-    
-    .vote-count {
-      position: absolute;
-      top: 50%;
-      left: 10px;
-      transform: translateY(-50%);
+    .teacher-name {
       font-weight: bold;
+      color: #ffcc00;
+    }
+    
+    .logout-btn {
+      background: #ff9800;
       color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: #f57c00;
     }
     
     .hidden {
       display: none;
     }
     
-    .student-info {
-      padding: 10px 15px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    
-    /* New styles matching teacher panel */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -326,17 +326,6 @@
       display: block;
     }
     
-    .candidate-details {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .candidate-roll {
-      font-size: 14px;
-      color: #ffcc00;
-      margin-top: 5px;
-    }
-    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -353,14 +342,23 @@
         max-width: 300px;
       }
       
-      .candidate-item {
+      .candidate-item,
+      .vote-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
       }
       
-      .position-section {
-        padding: 10px;
+      .candidate-actions,
+      .vote-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+      
+      .teacher-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
       }
       
       .tabs {
@@ -377,148 +375,338 @@
 </head>
 <body>
   <div class="navbar">
-    <h1>Student Voting System</h1>
+    <h1>Teacher Panel - Student Voting System</h1>
   </div>
   
-  <div class="container">
-    <!-- Student Login Section -->
-    <div id="loginSection">
-      <h2>Student Login</h2>
+  <!-- Login Section -->
+  <div class="container login-container" id="loginSection">
+    <h2>Teacher Login</h2>
+    <div class="section">
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="buttons">
+          <button type="submit" class="btn btn-primary">Login</button>
+          <a href="index.html" class="btn btn-secondary">Back to Home</a>
+        </div>
+      </form>
+    </div>
+    <div id="loginMessage" class="message" style="display: none;"></div>
+  </div>
+  
+  <!-- Teacher Panel (Initially Hidden) -->
+  <div class="container hidden" id="teacherPanel">
+    <!-- Teacher Info -->
+    <div class="teacher-info">
+      <div>
+        Welcome, <span class="teacher-name" id="teacherName">Teacher</span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+    
+    <!-- Success/Error Messages -->
+    <div id="message" class="message" style="display: none;"></div>
+    
+    <!-- Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number" id="totalCandidates">0</span>
+        <span class="stat-label">Total Candidates</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="totalVotes">0</span>
+        <span class="stat-label">Total Votes</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="votedStudents">0</span>
+        <span class="stat-label">Voted Students</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="leadingCandidate">-</span>
+        <span class="stat-label">Leading Candidate</span>
+      </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="candidates">Manage Candidates</div>
+      <div class="tab" data-tab="votes">View Votes</div>
+      <div class="tab" data-tab="danger">Danger Zone</div>
+    </div>
+    
+    <!-- Candidates Tab -->
+    <div class="tab-content active" id="candidatesTab">
+      <!-- Add Candidate Section -->
       <div class="section">
-        <form id="loginForm">
+        <h2>Add Candidate</h2>
+        <form id="addCandidateForm">
           <div class="form-group">
-            <label for="studentId">Student ID</label>
-            <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" required>
+            <label for="candidateRoll">Roll Number</label>
+            <input type="number" id="candidateRoll" name="roll" placeholder="Enter candidate roll number" required>
+          </div>
+          <div class="form-group">
+            <label for="candidateName">Candidate Name</label>
+            <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
+          </div>
+          <div class="form-group">
+            <label for="candidatePosition">Position</label>
+            <input type="text" id="candidatePosition" name="position" placeholder="Enter position (e.g., Class President)" required>
           </div>
           <div class="buttons">
-            <button type="submit" class="btn btn-primary">Login to Vote</button>
-            <a href="index.html" class="btn btn-secondary">Back to Home</a>
+            <button type="submit" class="btn btn-primary">Add Candidate</button>
+            <button type="button" id="refreshCandidatesBtn" class="btn btn-secondary">Refresh List</button>
           </div>
         </form>
       </div>
-      <div id="loginMessage" class="message" style="display: none;"></div>
-    </div>
-    
-    <!-- Voting Section -->
-    <div id="votingSection" class="hidden">
-      <h2>Cast Your Vote</h2>
       
+      <!-- Candidates List Section -->
       <div class="section">
-        <div class="student-info">
-          <p>Welcome, Student ID: <strong id="displayStudentId"></strong></p>
-        </div>
-        
-        <!-- Statistics Section -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-number" id="totalCandidates">0</span>
-            <span class="stat-label">Total Candidates</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="totalVotes">0</span>
-            <span class="stat-label">Total Votes</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="votedStudents">0</span>
-            <span class="stat-label">Voted Students</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="positionsCount">0</span>
-            <span class="stat-label">Positions</span>
-          </div>
-        </div>
-        
-        <!-- Tabs -->
-        <div class="tabs">
-          <div class="tab active" data-tab="candidates">Vote for Candidates</div>
-          <div class="tab" data-tab="instructions">Voting Instructions</div>
-        </div>
-        
-        <!-- Candidates Tab -->
-        <div class="tab-content active" id="candidatesTab">
-          <div id="message" class="message" style="display: none;"></div>
-          
-          <div id="positionsContainer">
-            <!-- Positions and candidates will be dynamically added here -->
-          </div>
-        </div>
-        
-        <!-- Instructions Tab -->
-        <div class="tab-content" id="instructionsTab">
-          <div class="section">
-            <h3>How to Vote</h3>
-            <ol style="margin-left: 20px; margin-top: 15px;">
-              <li>Select one candidate for each position by clicking the "Vote" button</li>
-              <li>Your selection will be highlighted in blue</li>
-              <li>You must vote for all positions before submitting</li>
-              <li>Once submitted, your vote cannot be changed</li>
-              <li>Each student can only vote once</li>
-            </ol>
-            
-            <h3 style="margin-top: 20px;">Important Notes</h3>
-            <ul style="margin-left: 20px; margin-top: 15px;">
-              <li>Voting is anonymous - your student ID is only used to verify eligibility</li>
-              <li>Results will be available after the voting period ends</li>
-              <li>Contact a teacher if you encounter any issues</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="buttons">
-          <button type="button" id="submitVoteBtn" class="btn btn-primary">Submit Vote</button>
-          <button type="button" id="logoutBtn" class="btn btn-secondary">Logout</button>
+        <h2>Current Candidates</h2>
+        <div id="candidatesList" class="candidates-list">
+          <!-- Candidate items will be dynamically added here -->
         </div>
       </div>
     </div>
     
-    <!-- Voting Complete Section -->
-    <div id="votingCompleteSection" class="hidden">
-      <div class="voting-complete">
-        <h2>Thank You for Voting!</h2>
-        <p>Your vote has been successfully recorded.</p>
+    <!-- Votes Tab -->
+    <div class="tab-content" id="votesTab">
+      <div class="section">
+        <h2>Vote Management</h2>
         <div class="buttons">
-          <button type="button" id="viewResultsBtn" class="btn btn-primary">View Results</button>
-          <a href="index.html" class="btn btn-secondary">Back to Home</a>
+          <button type="button" id="refreshVotesBtn" class="btn btn-secondary">Refresh Votes</button>
+          <button type="button" id="exportVotesBtn" class="btn btn-primary">Export Votes to CSV</button>
         </div>
         
-        <div class="results-preview">
-          <h3>Current Results</h3>
-          <div id="resultsPreview">
-            <!-- Results will be displayed here -->
-          </div>
+        <h3>Voting Results</h3>
+        <div id="resultsChart">
+          <!-- Results chart will be displayed here -->
+        </div>
+        
+        <h3>Individual Votes</h3>
+        <div id="votesList" class="votes-list">
+          <!-- Vote items will be dynamically added here -->
         </div>
       </div>
+    </div>
+    
+    <!-- Danger Zone Tab -->
+    <div class="tab-content" id="dangerTab">
+      <div class="section danger-zone">
+        <h3>Danger Zone</h3>
+        <p>Warning: These actions cannot be undone. Use with caution.</p>
+        <div class="buttons">
+          <button type="button" id="deleteAllVotesBtn" class="btn btn-danger">Delete All Votes</button>
+          <button type="button" id="deleteAllCandidatesBtn" class="btn btn-danger">Delete All Candidates</button>
+          <button type="button" id="resetSystemBtn" class="btn btn-danger">Reset Entire System</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation Buttons -->
+    <div class="buttons">
+      <a href="index.html" class="btn btn-secondary">Back to Home</a>
+      <a href="results.html" class="btn btn-primary">Public Results</a>
     </div>
   </div>
 
   <script>
+    // Teacher credentials
+    const teacherCredentials = [
+      { username: "admin", password: "admin123", name: "Administrator" },
+      { username: "teacher1", password: "teacher123", name: "Ms. Johnson" },
+      { username: "teacher2", password: "teacher456", name: "Mr. Smith" }
+    ];
+    
+    // Initialize data from localStorage or set defaults
+    let candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+    let votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
+    let voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+    let votes = JSON.parse(localStorage.getItem('votes') || '[]');
+    
     // DOM elements
     const loginSection = document.getElementById('loginSection');
-    const votingSection = document.getElementById('votingSection');
-    const votingCompleteSection = document.getElementById('votingCompleteSection');
+    const teacherPanel = document.getElementById('teacherPanel');
     const loginForm = document.getElementById('loginForm');
     const loginMessage = document.getElementById('loginMessage');
-    const displayStudentId = document.getElementById('displayStudentId');
-    const positionsContainer = document.getElementById('positionsContainer');
-    const submitVoteBtn = document.getElementById('submitVoteBtn');
+    const teacherNameElement = document.getElementById('teacherName');
     const logoutBtn = document.getElementById('logoutBtn');
-    const viewResultsBtn = document.getElementById('viewResultsBtn');
-    const resultsPreview = document.getElementById('resultsPreview');
     const messageDiv = document.getElementById('message');
     
-    // Statistics elements
+    // Candidate management
+    const addCandidateForm = document.getElementById('addCandidateForm');
+    const candidateRollInput = document.getElementById('candidateRoll');
+    const candidateNameInput = document.getElementById('candidateName');
+    const candidatePositionInput = document.getElementById('candidatePosition');
+    const candidatesList = document.getElementById('candidatesList');
+    const refreshCandidatesBtn = document.getElementById('refreshCandidatesBtn');
+    
+    // Vote management
+    const votesList = document.getElementById('votesList');
+    const refreshVotesBtn = document.getElementById('refreshVotesBtn');
+    const exportVotesBtn = document.getElementById('exportVotesBtn');
+    const resultsChart = document.getElementById('resultsChart');
+    
+    // Danger zone
+    const deleteAllVotesBtn = document.getElementById('deleteAllVotesBtn');
+    const deleteAllCandidatesBtn = document.getElementById('deleteAllCandidatesBtn');
+    const resetSystemBtn = document.getElementById('resetSystemBtn');
+    
+    // Statistics
     const totalCandidatesElement = document.getElementById('totalCandidates');
     const totalVotesElement = document.getElementById('totalVotes');
     const votedStudentsElement = document.getElementById('votedStudents');
-    const positionsCountElement = document.getElementById('positionsCount');
-    
-    // Voting data
-    let selectedCandidates = {};
-    let currentStudentId = '';
+    const leadingCandidateElement = document.getElementById('leadingCandidate');
     
     // Tabs
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Check if user is already logged in
+    checkLoginStatus();
+    
+    // Login form submission
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      
+      const teacher = teacherCredentials.find(t => 
+        t.username === username && t.password === password
+      );
+      
+      if (teacher) {
+        // Successful login
+        localStorage.setItem('teacherLoggedIn', 'true');
+        localStorage.setItem('teacherName', teacher.name);
+        teacherNameElement.textContent = teacher.name;
+        showPanel();
+        showLoginMessage(`Welcome, ${teacher.name}!`, 'success');
+      } else {
+        // Failed login
+        showLoginMessage('Invalid username or password. Please try again.', 'error');
+      }
+    });
+    
+    // Logout button
+    logoutBtn.addEventListener('click', function() {
+      localStorage.removeItem('teacherLoggedIn');
+      localStorage.removeItem('teacherName');
+      hidePanel();
+      loginForm.reset();
+      showLoginMessage('You have been logged out successfully.', 'info');
+    });
+    
+    // Add candidate form submission
+    addCandidateForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const candidateRoll = candidateRollInput.value.trim();
+      const candidateName = candidateNameInput.value.trim();
+      const candidatePosition = candidatePositionInput.value.trim();
+      
+      if (candidateRoll && candidateName && candidatePosition) {
+        // Check if roll number already exists
+        const existingCandidate = candidates.find(c => c.roll === candidateRoll);
+        if (existingCandidate) {
+          showMessage(`Roll number ${candidateRoll} is already assigned to ${existingCandidate.name}. Please use a unique roll number.`, 'error');
+          return;
+        }
+        
+        const newCandidate = {
+          id: Date.now(),
+          roll: candidateRoll,
+          name: candidateName,
+          position: candidatePosition
+        };
+        
+        candidates.push(newCandidate);
+        saveCandidates();
+        displayCandidates();
+        updateStatistics();
+        showMessage(`Candidate "${candidateName}" with roll number ${candidateRoll} added successfully!`, 'success');
+        candidateRollInput.value = '';
+        candidateNameInput.value = '';
+        candidatePositionInput.value = '';
+      } else {
+        showMessage('Please enter all candidate details.', 'error');
+      }
+    });
+    
+    // Refresh candidates button
+    refreshCandidatesBtn.addEventListener('click', function() {
+      displayCandidates();
+      showMessage('Candidate list refreshed.', 'info');
+    });
+    
+    // Refresh votes button
+    refreshVotesBtn.addEventListener('click', function() {
+      displayVotes();
+      displayResultsChart();
+      updateStatistics();
+      showMessage('Votes refreshed.', 'info');
+    });
+    
+    // Export votes button
+    exportVotesBtn.addEventListener('click', function() {
+      exportVotesToCSV();
+    });
+    
+    // Delete all votes button
+    deleteAllVotesBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to delete all votes? This action cannot be undone.')) {
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        saveVotes();
+        updateStatistics();
+        displayVotes();
+        displayResultsChart();
+        showMessage('All votes have been deleted.', 'success');
+      }
+    });
+    
+    // Delete all candidates button
+    deleteAllCandidatesBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to delete all candidates? This will also delete all votes. This action cannot be undone.')) {
+        candidates = [];
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        saveCandidates();
+        saveVotes();
+        updateStatistics();
+        displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        showMessage('All candidates and votes have been deleted.', 'success');
+      }
+    });
+    
+    // Reset system button
+    resetSystemBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to reset the entire system? This will delete all candidates, votes, and settings. This action cannot be undone.')) {
+        localStorage.removeItem('candidates');
+        localStorage.removeItem('votedStudents');
+        localStorage.removeItem('voteCounts');
+        localStorage.removeItem('votes');
+        candidates = [];
+        votedStudents = [];
+        voteCounts = {};
+        votes = [];
+        updateStatistics();
+        displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        showMessage('System has been reset to default state.', 'success');
+      }
+    });
     
     // Tab functionality
     tabs.forEach(tab => {
@@ -536,256 +724,303 @@
             content.classList.add('active');
           }
         });
-      });
-    });
-    
-    // Check if student has already voted
-    loginForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const studentId = document.getElementById('studentId').value.trim();
-      
-      if (!studentId) {
-        showLoginMessage('Please enter your student ID.', 'error');
-        return;
-      }
-      
-      // Check if student has already voted
-      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
-      
-      if (votedStudents.includes(studentId)) {
-        // Student has already voted
-        showLoginMessage('You have already voted. Each student can only vote once.', 'error');
-        return;
-      }
-      
-      // Check if voting is available (candidates exist)
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      
-      if (candidates.length === 0) {
-        showLoginMessage('No voting positions available at this time. Please check back later.', 'info');
-        return;
-      }
-      
-      // Successful login
-      currentStudentId = studentId;
-      displayStudentId.textContent = studentId;
-      showVotingSection();
-      displayCandidates();
-      updateStatistics();
-    });
-    
-    // Logout button
-    logoutBtn.addEventListener('click', function() {
-      currentStudentId = '';
-      selectedCandidates = {};
-      showLoginSection();
-      loginForm.reset();
-    });
-    
-    // Submit vote button
-    submitVoteBtn.addEventListener('click', function() {
-      // Check if all positions have a selection
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      const positions = [...new Set(candidates.map(c => c.position))];
-      
-      if (Object.keys(selectedCandidates).length !== positions.length) {
-        showMessage('Please vote for all positions before submitting.', 'error');
-        return;
-      }
-      
-      // Record the vote
-      recordVote();
-    });
-    
-    // View results button
-    viewResultsBtn.addEventListener('click', function() {
-      window.location.href = 'results.html';
-    });
-    
-    // Function to display candidates by position
-    function displayCandidates() {
-      positionsContainer.innerHTML = '';
-      
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      
-      if (candidates.length === 0) {
-        positionsContainer.innerHTML = '<div class="message info">No candidates available for voting at this time.</div>';
-        submitVoteBtn.disabled = true;
-        return;
-      }
-      
-      // Group candidates by position
-      const positions = [...new Set(candidates.map(c => c.position))];
-      
-      positions.forEach(position => {
-        const positionSection = document.createElement('div');
-        positionSection.className = 'position-section';
-        positionSection.innerHTML = `<h3>${position}</h3>`;
         
-        const positionCandidates = candidates.filter(c => c.position === position);
-        
-        positionCandidates.forEach(candidate => {
-          const candidateItem = document.createElement('div');
-          candidateItem.className = 'candidate-item';
-          candidateItem.innerHTML = `
-            <div class="candidate-details">
-              <div class="candidate-name">${candidate.name}</div>
-              <div class="candidate-roll">Roll Number: ${candidate.roll}</div>
-            </div>
-            <button class="vote-btn" data-position="${position}" data-candidate-id="${candidate.id}">Vote</button>
-          `;
-          positionSection.appendChild(candidateItem);
-        });
-        
-        positionsContainer.appendChild(positionSection);
-      });
-      
-      // Add event listeners to vote buttons
-      document.querySelectorAll('.vote-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const position = this.getAttribute('data-position');
-          const candidateId = this.getAttribute('data-candidate-id');
-          
-          // Update selection for this position
-          selectedCandidates[position] = candidateId;
-          
-          // Update button states
-          updateButtonStates(position, candidateId);
-          
-          showMessage(`You selected a candidate for ${position}.`, 'info');
-        });
-      });
-    }
-    
-    // Function to update button states when a candidate is selected
-    function updateButtonStates(selectedPosition, selectedCandidateId) {
-      // Reset all buttons for this position to default state
-      document.querySelectorAll(`.vote-btn[data-position="${selectedPosition}"]`).forEach(button => {
-        button.textContent = 'Vote';
-        button.classList.remove('selected');
-      });
-      
-      // Mark the selected candidate
-      const selectedButton = document.querySelector(`.vote-btn[data-candidate-id="${selectedCandidateId}"]`);
-      selectedButton.textContent = 'Selected ✓';
-      selectedButton.classList.add('selected');
-    }
-    
-    // Function to record the vote
-    function recordVote() {
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
-      let voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
-      let votes = JSON.parse(localStorage.getItem('votes') || '[]');
-      
-      // Record votes for each position
-      Object.keys(selectedCandidates).forEach(position => {
-        const candidateId = selectedCandidates[position];
-        
-        // Add to vote counts
-        if (!voteCounts[candidateId]) {
-          voteCounts[candidateId] = 0;
+        // Refresh data when switching to votes tab
+        if (tabId === 'votes') {
+          displayVotes();
+          displayResultsChart();
         }
-        voteCounts[candidateId]++;
-        
-        // Add to votes list
-        votes.push({
-          id: Date.now() + Math.random(), // Simple unique ID
-          studentId: currentStudentId,
-          candidateId: parseInt(candidateId),
-          position: position,
-          timestamp: new Date().toISOString()
-        });
       });
+    });
+    
+    // Function to check login status
+    function checkLoginStatus() {
+      const isLoggedIn = localStorage.getItem('teacherLoggedIn');
+      const name = localStorage.getItem('teacherName');
       
-      // Add student to voted students list
-      votedStudents.push(currentStudentId);
-      
-      // Save to localStorage
-      localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
-      localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
-      localStorage.setItem('votes', JSON.stringify(votes));
-      
-      // Show completion screen
-      showVotingCompleteSection();
-      displayResultsPreview();
+      if (isLoggedIn === 'true' && name) {
+        teacherNameElement.textContent = name;
+        showPanel();
+      } else {
+        hidePanel();
+      }
     }
     
-    // Function to display results preview
-    function displayResultsPreview() {
-      resultsPreview.innerHTML = '';
-      
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      const voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+    // Function to show teacher panel
+    function showPanel() {
+      loginSection.classList.add('hidden');
+      teacherPanel.classList.remove('hidden');
+      displayCandidates();
+      displayVotes();
+      displayResultsChart();
+      updateStatistics();
+    }
+    
+    // Function to hide teacher panel
+    function hidePanel() {
+      loginSection.classList.remove('hidden');
+      teacherPanel.classList.add('hidden');
+    }
+    
+    // Function to display candidates
+    function displayCandidates() {
+      candidatesList.innerHTML = '';
       
       if (candidates.length === 0) {
-        resultsPreview.innerHTML = '<div class="message info">No results available.</div>';
+        candidatesList.innerHTML = '<div class="message info">No candidates available. Add some candidates to get started.</div>';
         return;
       }
       
-      // Group candidates by position
-      const positions = [...new Set(candidates.map(c => c.position))];
+      candidates.forEach(candidate => {
+        const candidateItem = document.createElement('div');
+        candidateItem.className = 'candidate-item';
+        candidateItem.innerHTML = `
+          <div class="candidate-details">
+            <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
+            <div class="candidate-roll">Roll Number: ${candidate.roll}</div>
+          </div>
+          <div class="candidate-actions">
+            <button class="delete-btn" data-id="${candidate.id}">Delete</button>
+          </div>
+        `;
+        candidatesList.appendChild(candidateItem);
+      });
       
-      positions.forEach(position => {
-        const positionResults = document.createElement('div');
-        positionResults.innerHTML = `<h4>${position}</h4>`;
+      // Add event listeners to delete buttons
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const candidateId = parseInt(this.getAttribute('data-id'));
+          deleteCandidate(candidateId);
+        });
+      });
+    }
+    
+    // Function to delete a candidate
+    function deleteCandidate(id) {
+      if (confirm('Are you sure you want to delete this candidate? This will also delete all votes for this candidate.')) {
+        candidates = candidates.filter(candidate => candidate.id !== id);
         
-        const positionCandidates = candidates.filter(c => c.position === position);
+        // Remove votes for this candidate
+        votes = votes.filter(vote => vote.candidateId !== id);
         
-        positionCandidates.forEach(candidate => {
-          const voteCount = voteCounts[candidate.id] || 0;
-          const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
-          const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+        // Update vote counts
+        if (voteCounts[id]) {
+          delete voteCounts[id];
+        }
+        
+        saveCandidates();
+        saveVotes();
+        displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        updateStatistics();
+        showMessage('Candidate deleted successfully.', 'success');
+      }
+    }
+    
+    // Function to display votes
+    function displayVotes() {
+      votesList.innerHTML = '';
+      
+      if (votes.length === 0) {
+        votesList.innerHTML = '<div class="message info">No votes have been cast yet.</div>';
+        return;
+      }
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const voteItem = document.createElement('div');
+        voteItem.className = 'vote-item';
+        voteItem.innerHTML = `
+          <div class="vote-info">
+            <strong>Student ID:</strong> ${vote.studentId} | 
+            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} (Roll: ${candidate ? candidate.roll : 'N/A'}) | 
+            <strong>Time:</strong> ${new Date(vote.timestamp).toLocaleString()}
+          </div>
+          <div class="vote-actions">
+            <button class="delete-btn" data-vote-id="${vote.id}">Delete</button>
+          </div>
+        `;
+        votesList.appendChild(voteItem);
+      });
+      
+      // Add event listeners to delete vote buttons
+      document.querySelectorAll('.vote-actions .delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const voteId = this.getAttribute('data-vote-id');
+          deleteVote(voteId);
+        });
+      });
+    }
+    
+    // Function to delete a vote
+    function deleteVote(voteId) {
+      if (confirm('Are you sure you want to delete this vote?')) {
+        const voteIndex = votes.findIndex(v => v.id === voteId);
+        if (voteIndex !== -1) {
+          const vote = votes[voteIndex];
           
-          const candidateResult = document.createElement('div');
-          candidateResult.className = 'candidate-result';
-          candidateResult.innerHTML = `
+          // Remove from votedStudents
+          const studentIndex = votedStudents.indexOf(vote.studentId);
+          if (studentIndex !== -1) {
+            votedStudents.splice(studentIndex, 1);
+          }
+          
+          // Update vote counts
+          if (voteCounts[vote.candidateId]) {
+            voteCounts[vote.candidateId]--;
+            if (voteCounts[vote.candidateId] <= 0) {
+              delete voteCounts[vote.candidateId];
+            }
+          }
+          
+          // Remove the vote
+          votes.splice(voteIndex, 1);
+          
+          saveVotes();
+          displayVotes();
+          displayResultsChart();
+          updateStatistics();
+          showMessage('Vote deleted successfully.', 'success');
+        }
+      }
+    }
+    
+    // Function to display results chart
+    function displayResultsChart() {
+      resultsChart.innerHTML = '';
+      
+      if (candidates.length === 0) {
+        resultsChart.innerHTML = '<div class="message info">No candidates available to display results.</div>';
+        return;
+      }
+      
+      let chartHTML = '<div class="results-container">';
+      
+      candidates.forEach(candidate => {
+        const voteCount = voteCounts[candidate.id] || 0;
+        const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
+        const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+        
+        chartHTML += `
+          <div class="candidate-result">
             <div class="candidate-name">${candidate.name} (Roll: ${candidate.roll})</div>
             <div class="vote-bar-container">
               <div class="vote-bar" style="width: ${percentage}%"></div>
               <div class="vote-count">${voteCount} votes (${percentage}%)</div>
             </div>
-          `;
-          positionResults.appendChild(candidateResult);
-        });
-        
-        resultsPreview.appendChild(positionResults);
+          </div>
+        `;
       });
+      
+      chartHTML += '</div>';
+      resultsChart.innerHTML = chartHTML;
+      
+      // Add CSS for the chart
+      const style = document.createElement('style');
+      style.textContent = `
+        .candidate-result {
+          margin-bottom: 15px;
+        }
+        .vote-bar-container {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 5px;
+          height: 30px;
+          position: relative;
+          overflow: hidden;
+        }
+        .vote-bar {
+          background: #4CAF50;
+          height: 100%;
+          transition: width 0.5s ease;
+        }
+        .vote-count {
+          position: absolute;
+          top: 50%;
+          left: 10px;
+          transform: translateY(-50%);
+          font-weight: bold;
+          color: white;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+      `;
+      resultsChart.appendChild(style);
     }
     
     // Function to update statistics
     function updateStatistics() {
-      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      const votes = JSON.parse(localStorage.getItem('votes') || '[]');
-      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
-      const positions = [...new Set(candidates.map(c => c.position))];
-      
       totalCandidatesElement.textContent = candidates.length;
       totalVotesElement.textContent = votes.length;
       votedStudentsElement.textContent = votedStudents.length;
-      positionsCountElement.textContent = positions.length;
+      
+      // Find leading candidate
+      let leadingCandidate = '-';
+      let maxVotes = 0;
+      
+      candidates.forEach(candidate => {
+        const votesForCandidate = voteCounts[candidate.id] || 0;
+        if (votesForCandidate > maxVotes) {
+          maxVotes = votesForCandidate;
+          leadingCandidate = candidate.name;
+        }
+      });
+      
+      leadingCandidateElement.textContent = leadingCandidate;
     }
     
-    // Function to show login section
-    function showLoginSection() {
-      loginSection.classList.remove('hidden');
-      votingSection.classList.add('hidden');
-      votingCompleteSection.classList.add('hidden');
+    // Function to export votes to CSV
+    function exportVotesToCSV() {
+      if (votes.length === 0) {
+        showMessage('No votes to export.', 'error');
+        return;
+      }
+      
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student ID,Candidate,Candidate Roll,Position,Timestamp\n";
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const candidateName = candidate ? candidate.name : 'Unknown';
+        const candidateRoll = candidate ? candidate.roll : 'N/A';
+        const position = candidate ? candidate.position : 'Unknown';
+        const timestamp = new Date(vote.timestamp).toLocaleString();
+        
+        csvContent += `"${vote.studentId}","${candidateName}","${candidateRoll}","${position}","${timestamp}"\n`;
+      });
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "student_votes.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Votes exported successfully.', 'success');
     }
     
-    // Function to show voting section
-    function showVotingSection() {
-      loginSection.classList.add('hidden');
-      votingSection.classList.remove('hidden');
-      votingCompleteSection.classList.add('hidden');
+    // Function to save candidates to localStorage
+    function saveCandidates() {
+      localStorage.setItem('candidates', JSON.stringify(candidates));
     }
     
-    // Function to show voting complete section
-    function showVotingCompleteSection() {
-      loginSection.classList.add('hidden');
-      votingSection.classList.add('hidden');
-      votingCompleteSection.classList.remove('hidden');
+    // Function to save votes to localStorage
+    function saveVotes() {
+      localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
+      localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+      localStorage.setItem('votes', JSON.stringify(votes));
+    }
+    
+    // Function to show messages in teacher panel
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 5000);
     }
     
     // Function to show messages in login section
@@ -798,18 +1033,6 @@
       setTimeout(() => {
         loginMessage.style.display = 'none';
       }, 5000);
-    }
-    
-    // Function to show messages in voting section
-    function showMessage(text, type) {
-      messageDiv.textContent = text;
-      messageDiv.className = `message ${type}`;
-      messageDiv.style.display = 'block';
-      
-      // Hide message after 3 seconds
-      setTimeout(() => {
-        messageDiv.style.display = 'none';
-      }, 3000);
     }
   </script>
 </body>
