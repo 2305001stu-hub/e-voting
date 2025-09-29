@@ -40,7 +40,7 @@
       padding: 30px;
       border-radius: 15px;
       width: 90%;
-      max-width: 800px;
+      max-width: 1200px;
       margin: 30px auto;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
@@ -269,6 +269,74 @@
       text-align: center;
     }
     
+    /* New styles matching teacher panel */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border-left: 4px solid #ffcc00;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      color: #ffcc00;
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 16px;
+      color: #ddd;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      transition: background 0.3s;
+    }
+    
+    .tab.active {
+      background: rgba(255, 204, 0, 0.3);
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .candidate-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .candidate-roll {
+      font-size: 14px;
+      color: #ffcc00;
+      margin-top: 5px;
+    }
+    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -293,6 +361,16 @@
       
       .position-section {
         padding: 10px;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        margin-right: 0;
+        margin-bottom: 5px;
+        border-radius: 5px;
       }
     }
   </style>
@@ -330,10 +408,60 @@
           <p>Welcome, Student ID: <strong id="displayStudentId"></strong></p>
         </div>
         
-        <div id="message" class="message" style="display: none;"></div>
+        <!-- Statistics Section -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number" id="totalCandidates">0</span>
+            <span class="stat-label">Total Candidates</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="totalVotes">0</span>
+            <span class="stat-label">Total Votes</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="votedStudents">0</span>
+            <span class="stat-label">Voted Students</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="positionsCount">0</span>
+            <span class="stat-label">Positions</span>
+          </div>
+        </div>
         
-        <div id="positionsContainer">
-          <!-- Positions and candidates will be dynamically added here -->
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active" data-tab="candidates">Vote for Candidates</div>
+          <div class="tab" data-tab="instructions">Voting Instructions</div>
+        </div>
+        
+        <!-- Candidates Tab -->
+        <div class="tab-content active" id="candidatesTab">
+          <div id="message" class="message" style="display: none;"></div>
+          
+          <div id="positionsContainer">
+            <!-- Positions and candidates will be dynamically added here -->
+          </div>
+        </div>
+        
+        <!-- Instructions Tab -->
+        <div class="tab-content" id="instructionsTab">
+          <div class="section">
+            <h3>How to Vote</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+              <li>Select one candidate for each position by clicking the "Vote" button</li>
+              <li>Your selection will be highlighted in blue</li>
+              <li>You must vote for all positions before submitting</li>
+              <li>Once submitted, your vote cannot be changed</li>
+              <li>Each student can only vote once</li>
+            </ol>
+            
+            <h3 style="margin-top: 20px;">Important Notes</h3>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+              <li>Voting is anonymous - your student ID is only used to verify eligibility</li>
+              <li>Results will be available after the voting period ends</li>
+              <li>Contact a teacher if you encounter any issues</li>
+            </ul>
+          </div>
         </div>
         
         <div class="buttons">
@@ -378,9 +506,38 @@
     const resultsPreview = document.getElementById('resultsPreview');
     const messageDiv = document.getElementById('message');
     
+    // Statistics elements
+    const totalCandidatesElement = document.getElementById('totalCandidates');
+    const totalVotesElement = document.getElementById('totalVotes');
+    const votedStudentsElement = document.getElementById('votedStudents');
+    const positionsCountElement = document.getElementById('positionsCount');
+    
     // Voting data
     let selectedCandidates = {};
     let currentStudentId = '';
+    
+    // Tabs
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Tab functionality
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabId = this.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+          if (content.id === `${tabId}Tab`) {
+            content.classList.add('active');
+          }
+        });
+      });
+    });
     
     // Check if student has already voted
     loginForm.addEventListener('submit', function(e) {
@@ -415,6 +572,7 @@
       displayStudentId.textContent = studentId;
       showVotingSection();
       displayCandidates();
+      updateStatistics();
     });
     
     // Logout button
@@ -471,7 +629,10 @@
           const candidateItem = document.createElement('div');
           candidateItem.className = 'candidate-item';
           candidateItem.innerHTML = `
-            <div class="candidate-name">${candidate.name}</div>
+            <div class="candidate-details">
+              <div class="candidate-name">${candidate.name}</div>
+              <div class="candidate-roll">Roll Number: ${candidate.roll}</div>
+            </div>
             <button class="vote-btn" data-position="${position}" data-candidate-id="${candidate.id}">Vote</button>
           `;
           positionSection.appendChild(candidateItem);
@@ -580,7 +741,7 @@
           const candidateResult = document.createElement('div');
           candidateResult.className = 'candidate-result';
           candidateResult.innerHTML = `
-            <div class="candidate-name">${candidate.name}</div>
+            <div class="candidate-name">${candidate.name} (Roll: ${candidate.roll})</div>
             <div class="vote-bar-container">
               <div class="vote-bar" style="width: ${percentage}%"></div>
               <div class="vote-count">${voteCount} votes (${percentage}%)</div>
@@ -591,6 +752,19 @@
         
         resultsPreview.appendChild(positionResults);
       });
+    }
+    
+    // Function to update statistics
+    function updateStatistics() {
+      const candidates = JSON.parse(localStorage.getItem('candidates') || '[]');
+      const votes = JSON.parse(localStorage.getItem('votes') || '[]');
+      const votedStudents = JSON.parse(localStorage.getItem('votedStudents') || '[]');
+      const positions = [...new Set(candidates.map(c => c.position))];
+      
+      totalCandidatesElement.textContent = candidates.length;
+      totalVotesElement.textContent = votes.length;
+      votedStudentsElement.textContent = votedStudents.length;
+      positionsCountElement.textContent = positions.length;
     }
     
     // Function to show login section
