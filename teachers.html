@@ -84,7 +84,8 @@
     }
     
     input[type="text"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="number"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -164,6 +165,17 @@
     .vote-info {
       font-size: 18px;
       font-weight: 500;
+    }
+    
+    .candidate-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .candidate-roll {
+      font-size: 14px;
+      color: #ffcc00;
+      margin-top: 5px;
     }
     
     .candidate-actions,
@@ -435,6 +447,10 @@
         <h2>Add Candidate</h2>
         <form id="addCandidateForm">
           <div class="form-group">
+            <label for="candidateRoll">Roll Number</label>
+            <input type="number" id="candidateRoll" name="roll" placeholder="Enter candidate roll number" required>
+          </div>
+          <div class="form-group">
             <label for="candidateName">Candidate Name</label>
             <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
           </div>
@@ -524,6 +540,7 @@
     
     // Candidate management
     const addCandidateForm = document.getElementById('addCandidateForm');
+    const candidateRollInput = document.getElementById('candidateRoll');
     const candidateNameInput = document.getElementById('candidateName');
     const candidatePositionInput = document.getElementById('candidatePosition');
     const candidatesList = document.getElementById('candidatesList');
@@ -590,12 +607,21 @@
     addCandidateForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
+      const candidateRoll = candidateRollInput.value.trim();
       const candidateName = candidateNameInput.value.trim();
       const candidatePosition = candidatePositionInput.value.trim();
       
-      if (candidateName && candidatePosition) {
+      if (candidateRoll && candidateName && candidatePosition) {
+        // Check if roll number already exists
+        const existingCandidate = candidates.find(c => c.roll === candidateRoll);
+        if (existingCandidate) {
+          showMessage(`Roll number ${candidateRoll} is already assigned to ${existingCandidate.name}. Please use a unique roll number.`, 'error');
+          return;
+        }
+        
         const newCandidate = {
           id: Date.now(),
+          roll: candidateRoll,
           name: candidateName,
           position: candidatePosition
         };
@@ -604,11 +630,12 @@
         saveCandidates();
         displayCandidates();
         updateStatistics();
-        showMessage(`Candidate "${candidateName}" added successfully!`, 'success');
+        showMessage(`Candidate "${candidateName}" with roll number ${candidateRoll} added successfully!`, 'success');
+        candidateRollInput.value = '';
         candidateNameInput.value = '';
         candidatePositionInput.value = '';
       } else {
-        showMessage('Please enter both candidate name and position.', 'error');
+        showMessage('Please enter all candidate details.', 'error');
       }
     });
     
@@ -748,7 +775,10 @@
         const candidateItem = document.createElement('div');
         candidateItem.className = 'candidate-item';
         candidateItem.innerHTML = `
-          <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
+          <div class="candidate-details">
+            <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
+            <div class="candidate-roll">Roll Number: ${candidate.roll}</div>
+          </div>
           <div class="candidate-actions">
             <button class="delete-btn" data-id="${candidate.id}">Delete</button>
           </div>
@@ -804,7 +834,7 @@
         voteItem.innerHTML = `
           <div class="vote-info">
             <strong>Student ID:</strong> ${vote.studentId} | 
-            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} | 
+            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} (Roll: ${candidate ? candidate.roll : 'N/A'}) | 
             <strong>Time:</strong> ${new Date(vote.timestamp).toLocaleString()}
           </div>
           <div class="vote-actions">
@@ -874,7 +904,7 @@
         
         chartHTML += `
           <div class="candidate-result">
-            <div class="candidate-name">${candidate.name}</div>
+            <div class="candidate-name">${candidate.name} (Roll: ${candidate.roll})</div>
             <div class="vote-bar-container">
               <div class="vote-bar" style="width: ${percentage}%"></div>
               <div class="vote-count">${voteCount} votes (${percentage}%)</div>
@@ -946,15 +976,16 @@
       }
       
       let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Student ID,Candidate,Position,Timestamp\n";
+      csvContent += "Student ID,Candidate,Candidate Roll,Position,Timestamp\n";
       
       votes.forEach(vote => {
         const candidate = candidates.find(c => c.id === vote.candidateId);
         const candidateName = candidate ? candidate.name : 'Unknown';
+        const candidateRoll = candidate ? candidate.roll : 'N/A';
         const position = candidate ? candidate.position : 'Unknown';
         const timestamp = new Date(vote.timestamp).toLocaleString();
         
-        csvContent += `"${vote.studentId}","${candidateName}","${position}","${timestamp}"\n`;
+        csvContent += `"${vote.studentId}","${candidateName}","${candidateRoll}","${position}","${timestamp}"\n`;
       });
       
       const encodedUri = encodeURI(csvContent);
