@@ -84,8 +84,7 @@
     }
     
     input[type="text"],
-    input[type="password"],
-    input[type="number"] {
+    input[type="password"] {
       width: 100%;
       padding: 12px 15px;
       border: 1px solid #ccc;
@@ -167,18 +166,6 @@
       font-weight: 500;
     }
     
-    .candidate-details {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .candidate-id,
-    .candidate-roll {
-      font-size: 14px;
-      color: #ccc;
-      margin-top: 5px;
-    }
-    
     .candidate-actions,
     .vote-actions {
       display: flex;
@@ -198,21 +185,6 @@
     
     .delete-btn:hover {
       background: #d32f2f;
-    }
-    
-    .edit-btn {
-      background: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-    
-    .edit-btn:hover {
-      background: #0b7dda;
     }
     
     .message {
@@ -342,52 +314,6 @@
       display: block;
     }
     
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background: rgba(0, 0, 0, 0.9);
-      padding: 30px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    }
-    
-    .modal h3 {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    
-    .search-box {
-      margin-bottom: 20px;
-    }
-    
-    .search-box input {
-      width: 100%;
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: rgba(255, 255, 255, 0.9);
-    }
-    
     @media (max-width: 768px) {
       .container {
         width: 95%;
@@ -431,11 +357,6 @@
         margin-right: 0;
         margin-bottom: 5px;
         border-radius: 5px;
-      }
-      
-      .modal-content {
-        width: 95%;
-        padding: 20px;
       }
     }
   </style>
@@ -514,14 +435,6 @@
         <h2>Add Candidate</h2>
         <form id="addCandidateForm">
           <div class="form-group">
-            <label for="candidateId">Candidate ID (Unique)</label>
-            <input type="text" id="candidateId" name="candidateId" placeholder="Enter unique candidate ID" required>
-          </div>
-          <div class="form-group">
-            <label for="candidateRoll">Roll Number</label>
-            <input type="text" id="candidateRoll" name="candidateRoll" placeholder="Enter candidate roll number" required>
-          </div>
-          <div class="form-group">
             <label for="candidateName">Candidate Name</label>
             <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
           </div>
@@ -534,14 +447,6 @@
             <button type="button" id="refreshCandidatesBtn" class="btn btn-secondary">Refresh List</button>
           </div>
         </form>
-      </div>
-      
-      <!-- Search Candidates -->
-      <div class="section">
-        <h3>Search Candidates</h3>
-        <div class="search-box">
-          <input type="text" id="searchCandidate" placeholder="Search by name, ID, roll number, or position...">
-        </div>
       </div>
       
       <!-- Candidates List Section -->
@@ -594,32 +499,6 @@
     </div>
   </div>
 
-  <!-- Edit Candidate Modal -->
-  <div class="modal" id="editCandidateModal">
-    <div class="modal-content">
-      <h3>Edit Candidate</h3>
-      <form id="editCandidateForm">
-        <input type="hidden" id="editCandidateId">
-        <div class="form-group">
-          <label for="editCandidateRoll">Roll Number</label>
-          <input type="text" id="editCandidateRoll" required>
-        </div>
-        <div class="form-group">
-          <label for="editCandidateName">Candidate Name</label>
-          <input type="text" id="editCandidateName" required>
-        </div>
-        <div class="form-group">
-          <label for="editCandidatePosition">Position</label>
-          <input type="text" id="editCandidatePosition" required>
-        </div>
-        <div class="modal-buttons">
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-          <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script>
     // Teacher credentials
     const teacherCredentials = [
@@ -645,13 +524,10 @@
     
     // Candidate management
     const addCandidateForm = document.getElementById('addCandidateForm');
-    const candidateIdInput = document.getElementById('candidateId');
-    const candidateRollInput = document.getElementById('candidateRoll');
     const candidateNameInput = document.getElementById('candidateName');
     const candidatePositionInput = document.getElementById('candidatePosition');
     const candidatesList = document.getElementById('candidatesList');
     const refreshCandidatesBtn = document.getElementById('refreshCandidatesBtn');
-    const searchCandidateInput = document.getElementById('searchCandidate');
     
     // Vote management
     const votesList = document.getElementById('votesList');
@@ -673,15 +549,6 @@
     // Tabs
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
-    
-    // Modal elements
-    const editCandidateModal = document.getElementById('editCandidateModal');
-    const editCandidateForm = document.getElementById('editCandidateForm');
-    const editCandidateId = document.getElementById('editCandidateId');
-    const editCandidateRoll = document.getElementById('editCandidateRoll');
-    const editCandidateName = document.getElementById('editCandidateName');
-    const editCandidatePosition = document.getElementById('editCandidatePosition');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
     
     // Check if user is already logged in
     checkLoginStatus();
@@ -723,29 +590,12 @@
     addCandidateForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const candidateId = candidateIdInput.value.trim();
-      const candidateRoll = candidateRollInput.value.trim();
       const candidateName = candidateNameInput.value.trim();
       const candidatePosition = candidatePositionInput.value.trim();
       
-      if (candidateId && candidateRoll && candidateName && candidatePosition) {
-        // Check if candidate ID already exists
-        const existingCandidate = candidates.find(c => c.id === candidateId);
-        if (existingCandidate) {
-          showMessage(`Candidate ID "${candidateId}" already exists. Please use a unique ID.`, 'error');
-          return;
-        }
-        
-        // Check if roll number already exists
-        const existingRoll = candidates.find(c => c.roll === candidateRoll);
-        if (existingRoll) {
-          showMessage(`Roll number "${candidateRoll}" already exists. Please use a unique roll number.`, 'error');
-          return;
-        }
-        
+      if (candidateName && candidatePosition) {
         const newCandidate = {
-          id: candidateId,
-          roll: candidateRoll,
+          id: Date.now(),
           name: candidateName,
           position: candidatePosition
         };
@@ -755,12 +605,10 @@
         displayCandidates();
         updateStatistics();
         showMessage(`Candidate "${candidateName}" added successfully!`, 'success');
-        candidateIdInput.value = '';
-        candidateRollInput.value = '';
         candidateNameInput.value = '';
         candidatePositionInput.value = '';
       } else {
-        showMessage('Please enter all candidate details.', 'error');
+        showMessage('Please enter both candidate name and position.', 'error');
       }
     });
     
@@ -768,11 +616,6 @@
     refreshCandidatesBtn.addEventListener('click', function() {
       displayCandidates();
       showMessage('Candidate list refreshed.', 'info');
-    });
-    
-    // Search candidates
-    searchCandidateInput.addEventListener('input', function() {
-      displayCandidates(this.value);
     });
     
     // Refresh votes button
@@ -863,43 +706,6 @@
       });
     });
     
-    // Edit candidate form submission
-    editCandidateForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const candidateId = editCandidateId.value;
-      const candidateRoll = editCandidateRoll.value.trim();
-      const candidateName = editCandidateName.value.trim();
-      const candidatePosition = editCandidatePosition.value.trim();
-      
-      if (candidateRoll && candidateName && candidatePosition) {
-        const candidateIndex = candidates.findIndex(c => c.id === candidateId);
-        if (candidateIndex !== -1) {
-          // Check if roll number already exists (excluding current candidate)
-          const existingRoll = candidates.find(c => c.roll === candidateRoll && c.id !== candidateId);
-          if (existingRoll) {
-            showMessage(`Roll number "${candidateRoll}" already exists. Please use a unique roll number.`, 'error');
-            return;
-          }
-          
-          candidates[candidateIndex].roll = candidateRoll;
-          candidates[candidateIndex].name = candidateName;
-          candidates[candidateIndex].position = candidatePosition;
-          
-          saveCandidates();
-          displayCandidates();
-          updateStatistics();
-          showMessage('Candidate updated successfully!', 'success');
-          closeEditModal();
-        }
-      }
-    });
-    
-    // Cancel edit button
-    cancelEditBtn.addEventListener('click', function() {
-      closeEditModal();
-    });
-    
     // Function to check login status
     function checkLoginStatus() {
       const isLoggedIn = localStorage.getItem('teacherLoggedIn');
@@ -930,36 +736,20 @@
     }
     
     // Function to display candidates
-    function displayCandidates(searchTerm = '') {
+    function displayCandidates() {
       candidatesList.innerHTML = '';
       
-      let filteredCandidates = candidates;
-      
-      if (searchTerm) {
-        filteredCandidates = candidates.filter(candidate => 
-          candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          candidate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          candidate.roll.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          candidate.position.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      
-      if (filteredCandidates.length === 0) {
-        candidatesList.innerHTML = '<div class="message info">No candidates found. Add some candidates to get started.</div>';
+      if (candidates.length === 0) {
+        candidatesList.innerHTML = '<div class="message info">No candidates available. Add some candidates to get started.</div>';
         return;
       }
       
-      filteredCandidates.forEach(candidate => {
+      candidates.forEach(candidate => {
         const candidateItem = document.createElement('div');
         candidateItem.className = 'candidate-item';
         candidateItem.innerHTML = `
-          <div class="candidate-details">
-            <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
-            <div class="candidate-id">ID: ${candidate.id}</div>
-            <div class="candidate-roll">Roll: ${candidate.roll}</div>
-          </div>
+          <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
           <div class="candidate-actions">
-            <button class="edit-btn" data-id="${candidate.id}">Edit</button>
             <button class="delete-btn" data-id="${candidate.id}">Delete</button>
           </div>
         `;
@@ -969,16 +759,8 @@
       // Add event listeners to delete buttons
       document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function() {
-          const candidateId = this.getAttribute('data-id');
+          const candidateId = parseInt(this.getAttribute('data-id'));
           deleteCandidate(candidateId);
-        });
-      });
-      
-      // Add event listeners to edit buttons
-      document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const candidateId = this.getAttribute('data-id');
-          openEditModal(candidateId);
         });
       });
     }
@@ -1006,24 +788,6 @@
       }
     }
     
-    // Function to open edit modal
-    function openEditModal(candidateId) {
-      const candidate = candidates.find(c => c.id === candidateId);
-      if (candidate) {
-        editCandidateId.value = candidate.id;
-        editCandidateRoll.value = candidate.roll;
-        editCandidateName.value = candidate.name;
-        editCandidatePosition.value = candidate.position;
-        editCandidateModal.style.display = 'flex';
-      }
-    }
-    
-    // Function to close edit modal
-    function closeEditModal() {
-      editCandidateModal.style.display = 'none';
-      editCandidateForm.reset();
-    }
-    
     // Function to display votes
     function displayVotes() {
       votesList.innerHTML = '';
@@ -1040,7 +804,7 @@
         voteItem.innerHTML = `
           <div class="vote-info">
             <strong>Student ID:</strong> ${vote.studentId} | 
-            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} (ID: ${vote.candidateId}) | 
+            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} | 
             <strong>Time:</strong> ${new Date(vote.timestamp).toLocaleString()}
           </div>
           <div class="vote-actions">
@@ -1105,4 +869,140 @@
       
       candidates.forEach(candidate => {
         const voteCount = voteCounts[candidate.id] || 0;
-        const totalVotes = Object.values
+        const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
+        const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : 0;
+        
+        chartHTML += `
+          <div class="candidate-result">
+            <div class="candidate-name">${candidate.name}</div>
+            <div class="vote-bar-container">
+              <div class="vote-bar" style="width: ${percentage}%"></div>
+              <div class="vote-count">${voteCount} votes (${percentage}%)</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      chartHTML += '</div>';
+      resultsChart.innerHTML = chartHTML;
+      
+      // Add CSS for the chart
+      const style = document.createElement('style');
+      style.textContent = `
+        .candidate-result {
+          margin-bottom: 15px;
+        }
+        .vote-bar-container {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 5px;
+          height: 30px;
+          position: relative;
+          overflow: hidden;
+        }
+        .vote-bar {
+          background: #4CAF50;
+          height: 100%;
+          transition: width 0.5s ease;
+        }
+        .vote-count {
+          position: absolute;
+          top: 50%;
+          left: 10px;
+          transform: translateY(-50%);
+          font-weight: bold;
+          color: white;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+      `;
+      resultsChart.appendChild(style);
+    }
+    
+    // Function to update statistics
+    function updateStatistics() {
+      totalCandidatesElement.textContent = candidates.length;
+      totalVotesElement.textContent = votes.length;
+      votedStudentsElement.textContent = votedStudents.length;
+      
+      // Find leading candidate
+      let leadingCandidate = '-';
+      let maxVotes = 0;
+      
+      candidates.forEach(candidate => {
+        const votesForCandidate = voteCounts[candidate.id] || 0;
+        if (votesForCandidate > maxVotes) {
+          maxVotes = votesForCandidate;
+          leadingCandidate = candidate.name;
+        }
+      });
+      
+      leadingCandidateElement.textContent = leadingCandidate;
+    }
+    
+    // Function to export votes to CSV
+    function exportVotesToCSV() {
+      if (votes.length === 0) {
+        showMessage('No votes to export.', 'error');
+        return;
+      }
+      
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student ID,Candidate,Position,Timestamp\n";
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const candidateName = candidate ? candidate.name : 'Unknown';
+        const position = candidate ? candidate.position : 'Unknown';
+        const timestamp = new Date(vote.timestamp).toLocaleString();
+        
+        csvContent += `"${vote.studentId}","${candidateName}","${position}","${timestamp}"\n`;
+      });
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "student_votes.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Votes exported successfully.', 'success');
+    }
+    
+    // Function to save candidates to localStorage
+    function saveCandidates() {
+      localStorage.setItem('candidates', JSON.stringify(candidates));
+    }
+    
+    // Function to save votes to localStorage
+    function saveVotes() {
+      localStorage.setItem('votedStudents', JSON.stringify(votedStudents));
+      localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+      localStorage.setItem('votes', JSON.stringify(votes));
+    }
+    
+    // Function to show messages in teacher panel
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Function to show messages in login section
+    function showLoginMessage(text, type) {
+      loginMessage.textContent = text;
+      loginMessage.className = `message ${type}`;
+      loginMessage.style.display = 'block';
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        loginMessage.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
