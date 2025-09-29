@@ -172,7 +172,8 @@
       flex-direction: column;
     }
     
-    .candidate-id {
+    .candidate-id,
+    .candidate-roll {
       font-size: 14px;
       color: #ccc;
       margin-top: 5px;
@@ -517,6 +518,10 @@
             <input type="text" id="candidateId" name="candidateId" placeholder="Enter unique candidate ID" required>
           </div>
           <div class="form-group">
+            <label for="candidateRoll">Roll Number</label>
+            <input type="text" id="candidateRoll" name="candidateRoll" placeholder="Enter candidate roll number" required>
+          </div>
+          <div class="form-group">
             <label for="candidateName">Candidate Name</label>
             <input type="text" id="candidateName" name="candidate" placeholder="Enter candidate name" required>
           </div>
@@ -535,7 +540,7 @@
       <div class="section">
         <h3>Search Candidates</h3>
         <div class="search-box">
-          <input type="text" id="searchCandidate" placeholder="Search by name, ID, or position...">
+          <input type="text" id="searchCandidate" placeholder="Search by name, ID, roll number, or position...">
         </div>
       </div>
       
@@ -596,6 +601,10 @@
       <form id="editCandidateForm">
         <input type="hidden" id="editCandidateId">
         <div class="form-group">
+          <label for="editCandidateRoll">Roll Number</label>
+          <input type="text" id="editCandidateRoll" required>
+        </div>
+        <div class="form-group">
           <label for="editCandidateName">Candidate Name</label>
           <input type="text" id="editCandidateName" required>
         </div>
@@ -637,6 +646,7 @@
     // Candidate management
     const addCandidateForm = document.getElementById('addCandidateForm');
     const candidateIdInput = document.getElementById('candidateId');
+    const candidateRollInput = document.getElementById('candidateRoll');
     const candidateNameInput = document.getElementById('candidateName');
     const candidatePositionInput = document.getElementById('candidatePosition');
     const candidatesList = document.getElementById('candidatesList');
@@ -668,6 +678,7 @@
     const editCandidateModal = document.getElementById('editCandidateModal');
     const editCandidateForm = document.getElementById('editCandidateForm');
     const editCandidateId = document.getElementById('editCandidateId');
+    const editCandidateRoll = document.getElementById('editCandidateRoll');
     const editCandidateName = document.getElementById('editCandidateName');
     const editCandidatePosition = document.getElementById('editCandidatePosition');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -713,10 +724,11 @@
       e.preventDefault();
       
       const candidateId = candidateIdInput.value.trim();
+      const candidateRoll = candidateRollInput.value.trim();
       const candidateName = candidateNameInput.value.trim();
       const candidatePosition = candidatePositionInput.value.trim();
       
-      if (candidateId && candidateName && candidatePosition) {
+      if (candidateId && candidateRoll && candidateName && candidatePosition) {
         // Check if candidate ID already exists
         const existingCandidate = candidates.find(c => c.id === candidateId);
         if (existingCandidate) {
@@ -724,8 +736,16 @@
           return;
         }
         
+        // Check if roll number already exists
+        const existingRoll = candidates.find(c => c.roll === candidateRoll);
+        if (existingRoll) {
+          showMessage(`Roll number "${candidateRoll}" already exists. Please use a unique roll number.`, 'error');
+          return;
+        }
+        
         const newCandidate = {
           id: candidateId,
+          roll: candidateRoll,
           name: candidateName,
           position: candidatePosition
         };
@@ -736,6 +756,7 @@
         updateStatistics();
         showMessage(`Candidate "${candidateName}" added successfully!`, 'success');
         candidateIdInput.value = '';
+        candidateRollInput.value = '';
         candidateNameInput.value = '';
         candidatePositionInput.value = '';
       } else {
@@ -847,12 +868,21 @@
       e.preventDefault();
       
       const candidateId = editCandidateId.value;
+      const candidateRoll = editCandidateRoll.value.trim();
       const candidateName = editCandidateName.value.trim();
       const candidatePosition = editCandidatePosition.value.trim();
       
-      if (candidateName && candidatePosition) {
+      if (candidateRoll && candidateName && candidatePosition) {
         const candidateIndex = candidates.findIndex(c => c.id === candidateId);
         if (candidateIndex !== -1) {
+          // Check if roll number already exists (excluding current candidate)
+          const existingRoll = candidates.find(c => c.roll === candidateRoll && c.id !== candidateId);
+          if (existingRoll) {
+            showMessage(`Roll number "${candidateRoll}" already exists. Please use a unique roll number.`, 'error');
+            return;
+          }
+          
+          candidates[candidateIndex].roll = candidateRoll;
           candidates[candidateIndex].name = candidateName;
           candidates[candidateIndex].position = candidatePosition;
           
@@ -909,6 +939,7 @@
         filteredCandidates = candidates.filter(candidate => 
           candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           candidate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          candidate.roll.toLowerCase().includes(searchTerm.toLowerCase()) ||
           candidate.position.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
@@ -925,8 +956,153 @@
           <div class="candidate-details">
             <div class="candidate-name">${candidate.name} - ${candidate.position}</div>
             <div class="candidate-id">ID: ${candidate.id}</div>
+            <div class="candidate-roll">Roll: ${candidate.roll}</div>
           </div>
           <div class="candidate-actions">
             <button class="edit-btn" data-id="${candidate.id}">Edit</button>
             <button class="delete-btn" data-id="${candidate.id}">Delete</button>
           </div>
+        `;
+        candidatesList.appendChild(candidateItem);
+      });
+      
+      // Add event listeners to delete buttons
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const candidateId = this.getAttribute('data-id');
+          deleteCandidate(candidateId);
+        });
+      });
+      
+      // Add event listeners to edit buttons
+      document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const candidateId = this.getAttribute('data-id');
+          openEditModal(candidateId);
+        });
+      });
+    }
+    
+    // Function to delete a candidate
+    function deleteCandidate(id) {
+      if (confirm('Are you sure you want to delete this candidate? This will also delete all votes for this candidate.')) {
+        candidates = candidates.filter(candidate => candidate.id !== id);
+        
+        // Remove votes for this candidate
+        votes = votes.filter(vote => vote.candidateId !== id);
+        
+        // Update vote counts
+        if (voteCounts[id]) {
+          delete voteCounts[id];
+        }
+        
+        saveCandidates();
+        saveVotes();
+        displayCandidates();
+        displayVotes();
+        displayResultsChart();
+        updateStatistics();
+        showMessage('Candidate deleted successfully.', 'success');
+      }
+    }
+    
+    // Function to open edit modal
+    function openEditModal(candidateId) {
+      const candidate = candidates.find(c => c.id === candidateId);
+      if (candidate) {
+        editCandidateId.value = candidate.id;
+        editCandidateRoll.value = candidate.roll;
+        editCandidateName.value = candidate.name;
+        editCandidatePosition.value = candidate.position;
+        editCandidateModal.style.display = 'flex';
+      }
+    }
+    
+    // Function to close edit modal
+    function closeEditModal() {
+      editCandidateModal.style.display = 'none';
+      editCandidateForm.reset();
+    }
+    
+    // Function to display votes
+    function displayVotes() {
+      votesList.innerHTML = '';
+      
+      if (votes.length === 0) {
+        votesList.innerHTML = '<div class="message info">No votes have been cast yet.</div>';
+        return;
+      }
+      
+      votes.forEach(vote => {
+        const candidate = candidates.find(c => c.id === vote.candidateId);
+        const voteItem = document.createElement('div');
+        voteItem.className = 'vote-item';
+        voteItem.innerHTML = `
+          <div class="vote-info">
+            <strong>Student ID:</strong> ${vote.studentId} | 
+            <strong>Candidate:</strong> ${candidate ? candidate.name : 'Unknown'} (ID: ${vote.candidateId}) | 
+            <strong>Time:</strong> ${new Date(vote.timestamp).toLocaleString()}
+          </div>
+          <div class="vote-actions">
+            <button class="delete-btn" data-vote-id="${vote.id}">Delete</button>
+          </div>
+        `;
+        votesList.appendChild(voteItem);
+      });
+      
+      // Add event listeners to delete vote buttons
+      document.querySelectorAll('.vote-actions .delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const voteId = this.getAttribute('data-vote-id');
+          deleteVote(voteId);
+        });
+      });
+    }
+    
+    // Function to delete a vote
+    function deleteVote(voteId) {
+      if (confirm('Are you sure you want to delete this vote?')) {
+        const voteIndex = votes.findIndex(v => v.id === voteId);
+        if (voteIndex !== -1) {
+          const vote = votes[voteIndex];
+          
+          // Remove from votedStudents
+          const studentIndex = votedStudents.indexOf(vote.studentId);
+          if (studentIndex !== -1) {
+            votedStudents.splice(studentIndex, 1);
+          }
+          
+          // Update vote counts
+          if (voteCounts[vote.candidateId]) {
+            voteCounts[vote.candidateId]--;
+            if (voteCounts[vote.candidateId] <= 0) {
+              delete voteCounts[vote.candidateId];
+            }
+          }
+          
+          // Remove the vote
+          votes.splice(voteIndex, 1);
+          
+          saveVotes();
+          displayVotes();
+          displayResultsChart();
+          updateStatistics();
+          showMessage('Vote deleted successfully.', 'success');
+        }
+      }
+    }
+    
+    // Function to display results chart
+    function displayResultsChart() {
+      resultsChart.innerHTML = '';
+      
+      if (candidates.length === 0) {
+        resultsChart.innerHTML = '<div class="message info">No candidates available to display results.</div>';
+        return;
+      }
+      
+      let chartHTML = '<div class="results-container">';
+      
+      candidates.forEach(candidate => {
+        const voteCount = voteCounts[candidate.id] || 0;
+        const totalVotes = Object.values
